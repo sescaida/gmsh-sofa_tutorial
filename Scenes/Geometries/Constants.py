@@ -17,7 +17,7 @@ JointSlopeAngle = np.deg2rad(30)
 
 OuterRadius = Thickness/2 + 7
 NBellowSteps = 3
-StepHeight = 5
+StepHeight = 7
 TeethRadius = Thickness/2   
 WallThickness = 5
 CenterThickness = 3
