@@ -22,10 +22,10 @@ gmsh.initialize()
 gmsh.option.setNumber("Mesh.MeshOnlyVisible",1)
 gmsh.option.setNumber("General.Terminal", 1)
 
-
 gmsh.merge("Finger_Parametric.step")
 
 FingerDimTags = gmsh.model.getEntities(3)
+
 ThicknessMold = 2*Const.OuterRadius + 2*Const.MoldWallThickness
 HeightMold = Const.Height + Const.FixationWidth + Const.MoldWallThickness
 LengthMold = 3*Const.Length + 2*Const.MoldWallThickness
@@ -34,8 +34,10 @@ LengthMold = 3*Const.Length + 2*Const.MoldWallThickness
 # Create mold 
 #-----------------
 MoldBoxDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2,0,Const.MoldWallThickness, ThicknessMold, HeightMold, -LengthMold))
+CableRadius = 0.75
+CableDimTag = (3,gmsh.model.occ.addCylinder(0,5*Const.Height/6,2*Const.MoldWallThickness,0,0,-LengthMold-2*Const.MoldWallThickness,CableRadius))
 
-CutOut = gmsh.model.occ.cut([MoldBoxDimTag],FingerDimTags)
+CutOut = gmsh.model.occ.cut([MoldBoxDimTag],FingerDimTags+[CableDimTag])
 
 MoldBaseDimTag = CutOut[0][0]
 AllCavitiesDimTags = CutOut[0][1:]
@@ -52,7 +54,7 @@ MoldRim = CutOut[0][0]
 
 FuseOut = gmsh.model.occ.fuse([MoldBaseDimTag],[MoldRim])
 MoldDimTag = FuseOut[0][0]
-MoldPG = gmsh.model.addPhysicalGroup(3,[MoldDimTag])
+#MoldPG = gmsh.model.addPhysicalGroup(3,[MoldDimTag])
 
 gmsh.model.occ.synchronize()
 #-----------------
@@ -67,7 +69,7 @@ MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2+Const.MoldWall
 
 CavityCorkSketchDimTag = (2,FingerGeneration.createCavitySketch(Const.OuterRadius, Const.NBellowSteps, Const.StepHeight, Const.TeethRadius, Const.WallThickness/2, Const.CenterThickness))
 
-ExtrudeDimTags = gmsh.model.occ.extrude([CavityCorkSketchDimTag],0,Const.MoldWallThickness,0)
+ExtrudeDimTags = gmsh.model.occ.extrude([CavityCorkSketchDimTag],0,Const.CavityCorkThickness,0)
 
 
 HalfDimTag = ExtrudeDimTags[1]
@@ -96,14 +98,15 @@ LidDimTag = FuseOut[0][0]
 
 #LidPG = gmsh.model.addPhysicalGroup(3,[LidDimTag])
 
-hide_all()
+#hide_all()
 gmsh.model.setVisibility((LidDimTag,),False, True)
 gmsh.model.setVisibility((MoldDimTag,),False, True)
 print("MoldDimTag: ", MoldDimTag)
 print("LiddDimTag: ", LidDimTag)
+gmsh.write("Mold.step")
 #gmsh.model.setVisibility([MoldDimTag],True)
-gmsh.model.occ.synchronize()
-gmsh.fltk.run()
+#gmsh.model.occ.synchronize()
+#gmsh.fltk.run()
 
 gmsh.model.mesh.generate(2)
 gmsh.model.mesh.refine()

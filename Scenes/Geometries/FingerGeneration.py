@@ -39,6 +39,25 @@ def makeSegmentTipMod(SegmentDimTag, Length, Height, JointHeight, Thickness, Joi
     
     pass  
 
+def makeSegmentStage1Mod(SegmentDimTag, Length, Height, JointHeight, Thickness, JointSlopeAngle, lc=1):
+    
+    LengthDiagonal = (Height-JointHeight)/np.cos(JointSlopeAngle)
+    JointStandoff = LengthDiagonal*np.sin(JointSlopeAngle)    
+    Stage1DistanceToStandoff = 2
+    Stage1DistanceFromBase = 5
+    Overboarding = 3
+    SubstractionDepth = 2.5
+    ZOffset = JointStandoff+Stage1DistanceToStandoff
+    BoxSubstractionOuterDimTag = (3,gmsh.model.occ.addBox(-Thickness/2-Overboarding, Stage1DistanceFromBase,-ZOffset, Thickness+2*Overboarding, Height+Overboarding,-(Length-2*ZOffset)))
+    BoxSubstractionInnerDimTag = (3,gmsh.model.occ.addBox(-Thickness/2+SubstractionDepth, Stage1DistanceFromBase,-ZOffset,Thickness-2*SubstractionDepth,Height-(SubstractionDepth+Stage1DistanceFromBase),-(Length-2*ZOffset)))
+    
+    CutOut = gmsh.model.occ.cut([BoxSubstractionOuterDimTag], [BoxSubstractionInnerDimTag])
+    SubstractionObjectDimTag = CutOut[0][0]
+    
+    CutOut = gmsh.model.occ.cut([SegmentDimTag],[SubstractionObjectDimTag])
+    Segment1ModDimTag = CutOut[0][0]
+    return Segment1ModDimTag
+    
 def makeSegmentFixationMod(SegmentDimTag, Length, Height, JointHeight, Thickness, JointSlopeAngle, FixationWidth, lc=1):
     
     BoxFillDimTag = gmsh.model.occ.addBox(-Thickness/2,0,0, Thickness, Height, -Length/2)
@@ -120,7 +139,7 @@ def createCavitySketch(OuterRadius, NBellowSteps, StepHeight, TeethRadius, WallT
     SurfaceTag = gmsh.model.occ.addPlaneSurface([WireLoop])
     return SurfaceTag
     
-def createCavityVolume(OuterRadius, NBellowSteps, StepHeight, TeethRadius, WallThickness, CenterThickness, lc=1):
+def createCavityVolume(OuterRadius, NBellowSteps, StepHeight, TeethRadius, WallThickness, CenterThickness, CavityCorkThickness, lc=1):
     
     TotalHeight = NBellowSteps * StepHeight
     SurfaceTag = createCavitySketch(OuterRadius, NBellowSteps, StepHeight, TeethRadius, WallThickness,CenterThickness)
@@ -136,7 +155,7 @@ def createCavityVolume(OuterRadius, NBellowSteps, StepHeight, TeethRadius, WallT
     CavityBaseDimTag = FusionOut[0]
         
     Box1Tag = gmsh.model.occ.addBox(-CenterThickness,0,-(TotalHeight+1),2*CenterThickness,OuterRadius,2*(TotalHeight+1))
-    Box2Tag = gmsh.model.occ.addBox(-OuterRadius, 0, -(TotalHeight+1), 2*OuterRadius, CenterThickness, 2*(TotalHeight+1))
+    Box2Tag = gmsh.model.occ.addBox(-OuterRadius, 0, -(TotalHeight+1), 2*OuterRadius, CavityCorkThickness, 2*(TotalHeight+1))
     
     BoxDimTags = [(3,Box1Tag),(3,Box2Tag)]
     
@@ -147,7 +166,7 @@ def createCavityVolume(OuterRadius, NBellowSteps, StepHeight, TeethRadius, WallT
 
 def createAllCavities(OuterRadius, NBellowSteps, StepHeight, TeethRadius, WallThickness, CenterThickness,lc=1):
     
-    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, lc=lc)
+    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)
     Cavity2DimTags = gmsh.model.occ.copy(Cavity1DimTags)
     Cavity3DimTags = gmsh.model.occ.copy(Cavity1DimTags)
@@ -205,14 +224,16 @@ def exportCavities(lc=5):
     
     gmsh.clear()
     
-def createFinger(lc = 7):
+def createFinger(Stage1Mod=False, lc = 7):
     #-------------------
     # Segments 
     #-------------------            
     
-    Segment1DimTag = createSegment(Constants.Length, Constants.Height, Constants.JointHeight, Constants.Thickness, Constants.JointSlopeAngle)    
+    Segment1DimTag = createSegment(Constants.Length, Constants.Height, Constants.JointHeight, Constants.Thickness, Constants.JointSlopeAngle)        
     Segment2DimTags = gmsh.model.occ.copy([Segment1DimTag])
-    Segment3DimTags = gmsh.model.occ.copy([Segment1DimTag])
+    if Stage1Mod:
+        Segment2DimTags = [makeSegmentStage1Mod(Segment2DimTags[0], Constants.Length, Constants.Height, Constants.JointHeight, Constants.Thickness, Constants.JointSlopeAngle, lc=1)]    
+    Segment3DimTags = gmsh.model.occ.copy(Segment2DimTags)
     Segment1DimTag = makeSegmentFixationMod(Segment1DimTag, Constants.Length, Constants.Height, Constants.JointHeight, Constants.Thickness, Constants.JointSlopeAngle, Constants.FixationWidth)    
 
 #    gmsh.model.occ.synchronize()
@@ -289,4 +310,4 @@ def createFinger(lc = 7):
 
 def createShapes():
     exportCavities()
-    createFinger()
+    createFinger(Stage1Mod=False)
