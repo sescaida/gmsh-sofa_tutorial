@@ -10,9 +10,9 @@ import numpy as np
 
 # Geometric parameters
 Length = 40
-Height = 23
+Height = 20
 JointHeight = 6
-Thickness = 20
+Thickness = 17.5
 JointSlopeAngle = np.deg2rad(30)
 FixationWidth = 3
 
@@ -21,7 +21,7 @@ NBellowSteps = 3
 StepHeight = 4
 TeethRadius = Thickness/2   
 WallThickness = 4
-CenterThickness = 2
+CenterThickness = 1.5
 CavityCorkThickness = 3
 
 # Elasticity parameters
