@@ -102,13 +102,15 @@ def createMoldLid(AllCavitiesDimTags):
 
 #LidPG = gmsh.model.addPhysicalGroup(3,[LidDimTag])
 
-#hide_all()
-#gmsh.model.setVisibility((LidDimTag,),False, True)
-#gmsh.model.setVisibility((MoldDimTag,),False, True)
+
+
 def createMoldParts():    
     
     MoldDimTag, AllCavitiesDimTags = createFingerMold()
     LidDimTag = createMoldLid(AllCavitiesDimTags)
+    hide_all()
+    gmsh.model.setVisibility((LidDimTag,),False, True)
+    gmsh.model.setVisibility((MoldDimTag,),False, True)    
     print("MoldDimTag: ", MoldDimTag)
     print("LiddDimTag: ", LidDimTag)
     gmsh.write("Mold.step")    
