@@ -190,7 +190,7 @@ def exportCavities(lc=5):
     # Cavities
     #-------------------   
     
-    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, lc=lc)
+    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)
     gmsh.model.occ.synchronize()
     gmsh.model.mesh.generate(2)
@@ -198,7 +198,7 @@ def exportCavities(lc=5):
     
     gmsh.clear()
     
-    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, lc=lc)    
+    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)    
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)
     gmsh.model.occ.affineTransform(Cavity1DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
     gmsh.model.occ.synchronize()
@@ -207,7 +207,7 @@ def exportCavities(lc=5):
     
     gmsh.clear()
     
-    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, lc=lc)
+    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-2*Constants.Length)
     gmsh.model.occ.synchronize()
     gmsh.model.mesh.generate(2)
@@ -215,7 +215,7 @@ def exportCavities(lc=5):
     
     gmsh.clear()
     
-    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, lc=lc)    
+    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)    
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-2*Constants.Length)
     gmsh.model.occ.affineTransform(Cavity1DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
     gmsh.model.occ.synchronize()
