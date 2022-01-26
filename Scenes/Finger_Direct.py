@@ -35,6 +35,9 @@ class Controller(Sofa.Core.Controller):
         
         # Cavities
         self.SurfacePressureConstraint1 = self.ModelNode.Cavity01.SurfacePressureConstraint
+        self.SurfacePressureConstraint2 = self.ModelNode.Cavity02.SurfacePressureConstraint
+        self.SurfacePressureConstraint3 = self.ModelNode.Cavity03.SurfacePressureConstraint
+        self.SurfacePressureConstraint4 = self.ModelNode.Cavity04.SurfacePressureConstraint
         
         print('Finished Init')
         

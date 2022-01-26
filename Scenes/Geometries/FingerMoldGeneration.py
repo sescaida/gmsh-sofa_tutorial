@@ -74,7 +74,6 @@ def createMoldLid(AllCavitiesDimTags):
     
     ExtrudeDimTags = gmsh.model.occ.extrude([CavityCorkSketchDimTag],0,Const.CavityCorkThickness,0)
     
-    
     HalfDimTag = ExtrudeDimTags[1]
         
     HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
