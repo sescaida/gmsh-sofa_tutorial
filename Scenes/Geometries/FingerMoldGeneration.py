@@ -35,6 +35,7 @@ def createFingerMold():
     CableRadius = 0.75
     CableDimTag = (3,gmsh.model.occ.addCylinder(0,5*Const.Height/6,2*Const.MoldWallThickness,0,0,-LengthMold-2*Const.MoldWallThickness,CableRadius))
     
+#    gmsh.fltk.run()
     CutOut = gmsh.model.occ.cut([MoldBoxDimTag],FingerDimTags+[CableDimTag])
     
     MoldBaseDimTag = CutOut[0][0]
@@ -114,9 +115,10 @@ def createMoldParts():
     print("LiddDimTag: ", LidDimTag)
     gmsh.write("Mold.step")    
     gmsh.model.occ.synchronize()
-    gmsh.fltk.run()    
-    gmsh.model.mesh.generate(2)
-    gmsh.model.mesh.refine()
-    gmsh.write("Mold.stl")    
-    
+    return MoldDimTag, LidDimTag
+    #gmsh.fltk.run()    
+#    gmsh.model.mesh.generate(2)
+#    gmsh.model.mesh.refine()
+#    gmsh.write("Mold.stl")    
+#    
 createMoldParts()

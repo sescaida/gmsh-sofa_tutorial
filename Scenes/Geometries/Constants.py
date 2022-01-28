@@ -20,7 +20,7 @@ OuterRadius = Thickness/2 + 6
 NBellowSteps = 1
 StepHeight = 4
 TeethRadius = Thickness/2   
-WallThickness = 4
+WallThickness = 3
 CenterThickness = 1.5
 CavityCorkThickness = 3
 
@@ -31,3 +31,13 @@ YoungsModulus = 3000
 # Mold parameters
 MoldWallThickness = 3
 MoldCoverTolerance = 0.1
+LidHoleBorderThickness = 1
+LidHoleThickness = Thickness - 2*LidHoleBorderThickness
+LidHoleLength = 3*Length/5
+
+MoldHoleThickness = Thickness - 2*LidHoleBorderThickness
+MoldHoleLength = Length/2
+
+ThicknessMold = 2*OuterRadius + 2*MoldWallThickness
+LengthMold = 3*Length + 2*MoldWallThickness
+HeightMold = Height + FixationWidth + MoldWallThickness    
