@@ -35,10 +35,10 @@ def createFingerMold():
                                              Const.MoldWallThickness, 
                                              ThicknessMold, 
                                              HeightMold, 
-                                             -LengthMold))
+                                             -Const.LengthMold))
     
     CableHeight = 5*Const.Height/6
-    CableLength = LengthMold+2*Const.MoldWallThickness
+    CableLength = Const.LengthMold+2*Const.MoldWallThickness
     CableDimTag = (3,gmsh.model.occ.addCylinder(0,CableHeight,2*Const.MoldWallThickness,0,0,-CableLength,Const.CableRadius))
     
     #gmsh.fltk.run()
@@ -55,14 +55,14 @@ def createFingerMold():
                                                      Const.MoldWallThickness, 
                                                      ThicknessMold, 
                                                      -Const.MoldWallThickness, 
-                                                     -LengthMold))
+                                                     -Const.LengthMold))
      
     MoldBoxInnerRimDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2+Const.MoldWallThickness,
                                                      0,
                                                      0,
                                                      ThicknessMold-2*Const.MoldWallThickness,
                                                      -Const.MoldWallThickness, 
-                                                     -LengthMold+2*Const.MoldWallThickness))
+                                                     -Const.LengthMold+2*Const.MoldWallThickness))
     
     CutOut = gmsh.model.occ.cut([MoldBoxOuterRimDimTag],[MoldBoxInnerRimDimTag])
     MoldRim = CutOut[0][0]
@@ -85,14 +85,14 @@ def createMoldLid(AllCavitiesDimTags):
                                                 Const.MoldWallThickness, 
                                                 ThicknessMold, 
                                                 -Const.MoldWallThickness, 
-                                                -LengthMold))
+                                                -Const.LengthMold))
     
     MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2+Const.MoldWallThickness+Const.MoldCoverTolerance,
                                                      0,
                                                      Const.MoldCoverTolerance, 
                                                      ThicknessMold-2*Const.MoldWallThickness-2*Const.MoldCoverTolerance,
                                                      -Const.MoldWallThickness, 
-                                                     -LengthMold+2*Const.MoldWallThickness+2*Const.MoldCoverTolerance))
+                                                     -Const.LengthMold+2*Const.MoldWallThickness+2*Const.MoldCoverTolerance))
     
     #-----------------
     # Create cavity cork
