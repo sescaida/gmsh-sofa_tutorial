@@ -24,17 +24,20 @@ gmsh.initialize()
 gmsh.option.setNumber("Mesh.MeshOnlyVisible",1)
 gmsh.option.setNumber("General.Terminal", 1)
 
-ThicknessMold = 2*Const.OuterRadius + 2*Const.MoldWallThickness
-LengthMold = 3*Const.Length + 2*Const.MoldWallThickness
-HeightMold = Const.Height + Const.FixationWidth + Const.MoldWallThickness    
+
 
 def createMoldLid():
     
     #-----------------
     # Create mold lid
     #-----------------
-    MoldLidTopDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2,-Const.MoldWallThickness,Const.MoldWallThickness, ThicknessMold, -Const.MoldWallThickness, -LengthMold))
-    MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2+Const.MoldWallThickness+Const.MoldCoverTolerance,0,Const.MoldCoverTolerance, ThicknessMold-2*Const.MoldWallThickness-2*Const.MoldCoverTolerance, -Const.MoldWallThickness, -LengthMold+2*Const.MoldWallThickness+2*Const.MoldCoverTolerance))
+    MoldLidTopDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2,-Const.MoldWallThickness,Const.MoldWallThickness, Const.ThicknessMold, -Const.MoldWallThickness, -Const.LengthMold))
+    MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2+Const.MoldWallThickness+Const.MoldCoverTolerance,0,Const.MoldCoverTolerance, Const.ThicknessMold-2*Const.MoldWallThickness-2*Const.MoldCoverTolerance, -Const.MoldWallThickness, -Const.LengthMold+2*Const.MoldWallThickness+2*Const.MoldCoverTolerance))
+    FuseOut = gmsh.model.occ.fuse([MoldLidTopDimTag],[MoldLidInteriorDimTag)
+    LidDimTag = FuseOut[0][0]
+    
+    HoleDimTag = (3,gmsh.model.occ.addBox(Const.OuterRadius*2))
+    
     gmsh.model.occ.synchronize()
     gmsh.fltk.run()    
     #-----------------
