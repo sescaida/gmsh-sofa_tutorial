@@ -17,7 +17,7 @@ JointSlopeAngle = np.deg2rad(30)
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
-NBellowSteps = 1
+NBellowSteps = 3
 StepHeight = 4
 TeethRadius = Thickness/2   
 WallThickness = 3
@@ -31,6 +31,7 @@ YoungsModulus = 3000
 # Mold parameters
 MoldWallThickness = 3
 MoldCoverTolerance = 0.1
+LengthMold = 3*Length + 2*MoldWallThickness
 LidHoleBorderThickness = 1
 LidHoleThickness = Thickness - 2*LidHoleBorderThickness
 LidHoleLength = 3*Length/5
@@ -42,3 +43,6 @@ ThicknessMold = 2*OuterRadius + 2*MoldWallThickness
 LengthMold = 3*Length + 2*MoldWallThickness
 HeightMold = Height + FixationWidth + MoldWallThickness    
 MoldHoleLidBorderThickness = 2
+
+#Cable
+CableRadius = 0.75

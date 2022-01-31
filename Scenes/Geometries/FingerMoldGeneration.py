@@ -26,7 +26,6 @@ gmsh.option.setNumber("General.Terminal", 1)
 
 FingerDimTags = gmsh.model.getEntities(3)
 ThicknessMold = 2*Const.OuterRadius + 2*Const.MoldWallThickness
-LengthMold = 3*Const.Length + 2*Const.MoldWallThickness
 HeightMold = Const.Height + Const.FixationWidth + Const.MoldWallThickness    
 
 def createFingerMold():        
@@ -37,8 +36,10 @@ def createFingerMold():
                                              ThicknessMold, 
                                              HeightMold, 
                                              -LengthMold))
-    CableRadius = 0.75
-    CableDimTag = (3,gmsh.model.occ.addCylinder(0,5*Const.Height/6,2*Const.MoldWallThickness,0,0,-LengthMold-2*Const.MoldWallThickness,CableRadius))
+    
+    CableHeight = 5*Const.Height/6
+    CableLength = LengthMold+2*Const.MoldWallThickness
+    CableDimTag = (3,gmsh.model.occ.addCylinder(0,CableHeight,2*Const.MoldWallThickness,0,0,-CableLength,Const.CableRadius))
     
     #gmsh.fltk.run()
     CutOut = gmsh.model.occ.cut([MoldBoxDimTag],FingerDimTags+[CableDimTag])
