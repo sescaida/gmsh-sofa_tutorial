@@ -17,33 +17,147 @@ Created on Thu Jan 20 14:25:13 2022
 import gmsh 
 import numpy as np
 import Constants as Const
+import FingerGeneration
+import FingerMoldGeneration
 
 
+#gmsh.initialize()
+#gmsh.option.setNumber("Mesh.MeshOnlyVisible",1)
+#gmsh.option.setNumber("General.Terminal", 1)
 
-gmsh.initialize()
-gmsh.option.setNumber("Mesh.MeshOnlyVisible",1)
-gmsh.option.setNumber("General.Terminal", 1)
+def createMoldStage2():
+    MoldDimTag, Lid_Stage1_DimTag = FingerMoldGeneration.createFingerMold()
+    MoldHole1DimTag = (3,gmsh.model.occ.addBox(-Const.MoldHoleThickness/2,0,Const.MoldHoleLength/2,Const.MoldHoleThickness,2*Const.MoldWallThickness,-Const.MoldHoleLength))    
+    MoldHole2DimTag = gmsh.model.occ.copy([MoldHole1DimTag])[0]
+    gmsh.model.occ.translate([MoldHole1DimTag],0,Const.Height,-1.5*Const.Length)
+    gmsh.model.occ.translate([MoldHole2DimTag],0,Const.Height,-2.5*Const.Length)    
+    CutOut = gmsh.model.occ.cut([MoldDimTag], [MoldHole1DimTag, MoldHole2DimTag])
+    gmsh.model.mesh.generate(2)
+    gmsh.model.mesh.refine()
+    gmsh.write("MoldStage2.stl")
+    #MoldWithHolesDimTag = CutOut[0][0]
 
 
-
-def createMoldLid():
+def createMoldLidStage2():
     
     #-----------------
     # Create mold lid
     #-----------------
     MoldLidTopDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2,-Const.MoldWallThickness,Const.MoldWallThickness, Const.ThicknessMold, -Const.MoldWallThickness, -Const.LengthMold))
     MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2+Const.MoldWallThickness+Const.MoldCoverTolerance,0,Const.MoldCoverTolerance, Const.ThicknessMold-2*Const.MoldWallThickness-2*Const.MoldCoverTolerance, -Const.MoldWallThickness, -Const.LengthMold+2*Const.MoldWallThickness+2*Const.MoldCoverTolerance))
-    FuseOut = gmsh.model.occ.fuse([MoldLidTopDimTag],[MoldLidInteriorDimTag)
-    LidDimTag = FuseOut[0][0]
+    FuseOut = gmsh.model.occ.fuse([MoldLidTopDimTag], [MoldLidInteriorDimTag])
+    MoldLidIntermediateDimTag = FuseOut[0][0]
+    LidHole1DimTag = (3,gmsh.model.occ.addBox(-Const.LidHoleThickness/2,0,Const.LidHoleLength/2,Const.LidHoleThickness,-2*Const.MoldWallThickness,-Const.LidHoleLength))
+    LidHole2DimTag = gmsh.model.occ.copy([LidHole1DimTag])[0]
+    gmsh.model.occ.translate([LidHole1DimTag],0,0,-1.5*Const.Length)
+    gmsh.model.occ.translate([LidHole2DimTag],0,0,-2.5*Const.Length)
     
-    HoleDimTag = (3,gmsh.model.occ.addBox(Const.OuterRadius*2))
-    
+    CutOut = gmsh.model.occ.cut([MoldLidIntermediateDimTag],[LidHole1DimTag,LidHole2DimTag])
+    MoldLidWithHolesDimTag = CutOut[0][0]
     gmsh.model.occ.synchronize()
+    gmsh.write("MoldLidStage2.step")
     gmsh.fltk.run()    
     #-----------------
     # Create cavity cork
     #-----------------
     
+def createHoleLidForMoldStage2():
+    Tolerance = 0.1
+    MoldHole1DimTag = (3,gmsh.model.occ.addBox(-(Const.MoldHoleThickness/2+Tolerance),0,Const.MoldHoleLength/2+Tolerance,Const.MoldHoleThickness+2*Tolerance,2*Const.MoldWallThickness,-(Const.MoldHoleLength+2*Tolerance)))   
+    MoldHoleLidDimTag = (3,gmsh.model.occ.addBox(-(Const.MoldHoleThickness/2+Const.MoldHoleLidBorderThickness),
+                                                 0,
+                                                 Const.MoldHoleLength/2+Const.MoldHoleLidBorderThickness,
+                                                 Const.MoldHoleThickness+2*Const.MoldHoleLidBorderThickness,
+                                                 2*Const.MoldWallThickness/2,
+                                                 -(Const.MoldHoleLength+2*Const.MoldHoleLidBorderThickness)))
+    gmsh.model.occ.translate([MoldHole1DimTag],0,Const.Height,-1.5*Const.Length)
+    gmsh.model.occ.translate([MoldHoleLidDimTag],0,Const.Height+2*Const.MoldWallThickness,-1.5*Const.Length)
+    FuseOut = gmsh.model.occ.fuse([MoldHole1DimTag],[MoldHoleLidDimTag])
+
+    
 #LidPG = gmsh.model.addPhysicalGroup(3,[LidDimTag])
     
-createMoldLid()
+def creakteMoldForCork():
+    
+    CavityCorkSketchDimTag = (2,FingerGeneration.createCavitySketch(Const.OuterRadius, Const.NBellowSteps, Const.StepHeight, Const.TeethRadius, Const.WallThickness/2, Const.CenterThickness))    
+    Tolerance = 2
+    TotalBellowHeight = Const.NBellowSteps * Const.StepHeight * 2
+    CorkMoldHeight = TotalBellowHeight + 2 * Tolerance
+    CorkMoldThickness = (Const.OuterRadius+Tolerance) * 2    
+    ExtrudeDimTags = gmsh.model.occ.extrude([CavityCorkSketchDimTag],0,Const.CavityCorkThickness,0)    
+    HalfDimTag = ExtrudeDimTags[1]
+        
+    HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
+    print("HalfCopyDimTag: ", HalfCopyDimTag)
+    gmsh.model.occ.affineTransform(HalfCopyDimTag, [1,0,0,0, 0,1,0,0, 0,0,-1,0])
+     
+    FusionOut = gmsh.model.occ.fuse([HalfDimTag], HalfCopyDimTag)
+    CavityCorkDimTag = FusionOut[0][0]
+    CavityCork2DimTags = gmsh.model.occ.copy([CavityCorkDimTag])
+    gmsh.model.occ.affineTransform(CavityCork2DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
+    
+    FuseOut = gmsh.model.occ.fuse([CavityCorkDimTag],CavityCork2DimTags)
+    
+    CompleteCorkDimTag = FuseOut[0][0]
+    CavityMoldBoxDimTag = (3,gmsh.model.occ.addBox(-CorkMoldThickness/2,
+                                                   -Tolerance,
+                                                   -CorkMoldHeight/2,
+                                                   CorkMoldThickness, 
+                                                   Const.CavityCorkThickness+Tolerance,
+                                                   CorkMoldHeight))
+    CutOut = gmsh.model.occ.cut([CavityMoldBoxDimTag],[CompleteCorkDimTag])
+    
+def createFingerClamp():
+    
+    gmsh.merge("Finger_Parametric.step")
+    FingerDimTags = gmsh.model.getEntities(3)
+    
+    ClampBoxWidth = 4*Const.FixationWidth+Const.Thickness
+    ClampBoxLength = 4*Const.FixationWidth
+    ClampBoxHeight = Const.Height + 2 * Const.FixationWidth 
+    ClampBoxDimDag = (3,gmsh.model.occ.addBox(-ClampBoxWidth/2,
+                                           0,
+                                           -ClampBoxLength/2,
+                                           ClampBoxWidth,
+                                           ClampBoxHeight,
+                                           ClampBoxLength))
+    
+    ScrewRadius = 1.7
+    ScrewEarWidth = 6
+    ScrewEarHeight = 3 
+    ScrewEarLength = ScrewEarWidth
+    
+    ScrewEarBoxDimDag = (3,gmsh.model.occ.addBox(ClampBoxWidth/2,
+                                           0,
+                                           -ScrewEarLength/2,
+                                           ScrewEarWidth,
+                                           ScrewEarHeight,
+                                           ScrewEarLength))
+    
+    ScrewLength = 6
+    ScrewCylinderDimTag = (3,gmsh.model.occ.addCylinder(ClampBoxWidth/2+ScrewEarWidth/2,-ScrewLength/3,0, 0,ScrewLength,0,ScrewRadius))
+    
+    
+    ScrewEarBox2DimTags = gmsh.model.occ.copy([ScrewEarBoxDimDag])
+    gmsh.model.occ.affineTransform(ScrewEarBox2DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
+    
+    ScrewCylinder2DimTags = gmsh.model.occ.copy([ScrewCylinderDimTag])
+    gmsh.model.occ.affineTransform(ScrewCylinder2DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
+    
+    CableHeight = 5*Const.Height/6
+    CableLength = Const.LengthMold+2*Const.MoldWallThickness
+    CableDimTag = (3,gmsh.model.occ.addCylinder(0,CableHeight,2*Const.MoldWallThickness,0,0,-CableLength,Const.CableRadius))
+    
+    FuseOut = gmsh.model.occ.fuse([ClampBoxDimDag],[ScrewEarBoxDimDag]+ScrewEarBox2DimTags)
+    PositiveBoxDimTag = FuseOut[0][0]
+    
+    gmsh.model.occ.cut([PositiveBoxDimTag],FingerDimTags+ScrewCylinder2DimTags + [ScrewCylinderDimTag,CableDimTag])
+#    gmsh.model.occ
+#createMoldStage2()
+#createMoldHoleLid()
+#creakteMoldForCork()
+createFingerClamp()
+gmsh.model.occ.synchronize()
+gmsh.fltk.run()
+    
+#createMoldLidStage2()

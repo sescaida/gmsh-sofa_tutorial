@@ -34,10 +34,11 @@ class Controller(Sofa.Core.Controller):
         self.CurrentAngle = 0
         
         # Cavities
-        self.SurfacePressureConstraint1 = self.ModelNode.Cavity01.SurfacePressureConstraint
+        self.SurfacePressureConstraint1 = self.ModelNode.Cavity01.SurfacePressureConstraint        
         self.SurfacePressureConstraint2 = self.ModelNode.Cavity02.SurfacePressureConstraint
         self.SurfacePressureConstraint3 = self.ModelNode.Cavity03.SurfacePressureConstraint
         self.SurfacePressureConstraint4 = self.ModelNode.Cavity04.SurfacePressureConstraint
+        
         
         print('Finished Init')
         
@@ -55,6 +56,14 @@ class Controller(Sofa.Core.Controller):
         CurrentCableLength = np.array(self.CableConstraint.value.value[0])
         print("CurrentCableLength", CurrentCableLength)
         Increment = 1
+        
+        if (key == "0"):
+            InitialCavityVolume = self.ModelNode.Cavity01.SurfacePressureConstraint.initialCavityVolume.value
+            Cavity01VolumeGrowth = self.SurfacePressureConstraint1.volumeGrowth.value
+            GrowthPercent = np.abs(Cavity01VolumeGrowth)/InitialCavityVolume * 100
+            GrowthPerDisplacement = np.abs(Cavity01VolumeGrowth)/CurrentCableLength
+            print("GrowthPercent: ", GrowthPercent)
+            print("GrowthPerDisplacement: ", GrowthPerDisplacement)
         
         if (key == "6"):
             pass
