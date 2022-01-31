@@ -68,7 +68,7 @@ def creakteMoldForCork():
     
 def createFingerClamp():
     # Attention: This task is optional and will get you 1 pt extra in your course grade!
-    # Create a clamp for the finger having to holes to fix it to a rig! Hint: use the geomtry of the Finger,
+    # Create a clamp for the finger having to holes to fix it to a rig! Hint: use the geomtry of the Finger and Cable
     
     MoldDimTag, Lid_Stage1_DimTag = FingerMoldGeneration.createFingerMold()
     
