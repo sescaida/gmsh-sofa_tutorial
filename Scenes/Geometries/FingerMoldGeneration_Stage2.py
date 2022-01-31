@@ -20,11 +20,6 @@ import Constants as Const
 import FingerGeneration
 import FingerMoldGeneration
 
-
-#gmsh.initialize()
-#gmsh.option.setNumber("Mesh.MeshOnlyVisible",1)
-#gmsh.option.setNumber("General.Terminal", 1)
-
 def createMoldStage2():
     MoldDimTag, Lid_Stage1_DimTag = FingerMoldGeneration.createFingerMold()
     MoldHole1DimTag = (3,gmsh.model.occ.addBox(-Const.MoldHoleThickness/2,0,Const.MoldHoleLength/2,Const.MoldHoleThickness,2*Const.MoldWallThickness,-Const.MoldHoleLength))    
@@ -152,12 +147,11 @@ def createFingerClamp():
     PositiveBoxDimTag = FuseOut[0][0]
     
     gmsh.model.occ.cut([PositiveBoxDimTag],FingerDimTags+ScrewCylinder2DimTags + [ScrewCylinderDimTag,CableDimTag])
-#    gmsh.model.occ
+
 #createMoldStage2()
-#createMoldHoleLid()
+createMoldLidStage2()
+#createHoleLidForMoldStage2()
 #creakteMoldForCork()
-createFingerClamp()
+#createFingerClamp()
 gmsh.model.occ.synchronize()
 gmsh.fltk.run()
-    
-#createMoldLidStage2()

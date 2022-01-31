@@ -302,6 +302,7 @@ def createFinger(Stage1Mod=False, lc = 7):
     #-------------------
     
     CutOut = gmsh.model.occ.cut(FingerNoCavitiesDimTag,AllCavitiesDimTags)
+    FingerDimTag = CutOut[0][0]
     gmsh.model.occ.synchronize()
     
     #-------------------
@@ -338,9 +339,10 @@ def createFinger(Stage1Mod=False, lc = 7):
     gmsh.model.mesh.generate(2)
     gmsh.model.mesh.refine()
     gmsh.write("Finger_Surface.stl")
-
-    gmsh.fltk.run()
+    return FingerDimTag
+ 
+#    gmsh.fltk.run()
 
 def createShapes():
     exportCavities()
-    createFinger(Stage1Mod=False)
+    FingerDimTag = createFinger(Stage1Mod=False)

@@ -18,23 +18,15 @@ def hide_all():
         gmsh.model.setVisibility((x,), False)
 
 
-gmsh.initialize()
-gmsh.option.setNumber("Mesh.MeshOnlyVisible",1)
-gmsh.option.setNumber("General.Terminal", 1)
-
-#gmsh.merge("Finger_Parametric.step")
-
-FingerDimTags = gmsh.model.getEntities(3)
-ThicknessMold = 2*Const.OuterRadius + 2*Const.MoldWallThickness
-HeightMold = Const.Height + Const.FixationWidth + Const.MoldWallThickness    
-
-def createFingerMold():        
+def createFingerMold(Stage1Mod=False):        
     
-    MoldBoxDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2,
+    FingerDimTag = FingerGeneration.createFinger(Stage1Mod)
+    
+    MoldBoxDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2,
                                              0,
                                              Const.MoldWallThickness, 
-                                             ThicknessMold, 
-                                             HeightMold, 
+                                             Const.ThicknessMold, 
+                                             Const.HeightMold, 
                                              -Const.LengthMold))
     
     CableHeight = 5*Const.Height/6
@@ -42,7 +34,7 @@ def createFingerMold():
     CableDimTag = (3,gmsh.model.occ.addCylinder(0,CableHeight,2*Const.MoldWallThickness,0,0,-CableLength,Const.CableRadius))
     
     #gmsh.fltk.run()
-    CutOut = gmsh.model.occ.cut([MoldBoxDimTag],FingerDimTags+[CableDimTag])
+    CutOut = gmsh.model.occ.cut([MoldBoxDimTag],[FingerDimTag, CableDimTag])
     
     MoldBaseDimTag = CutOut[0][0]
     AllCavitiesDimTags = CutOut[0][1:]
@@ -50,17 +42,17 @@ def createFingerMold():
     print("MoldBaseDimTag : ", MoldBaseDimTag )
     print("AllCavities: ", AllCavitiesDimTags)
     
-    MoldBoxOuterRimDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2,
+    MoldBoxOuterRimDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2,
                                                      0,
                                                      Const.MoldWallThickness, 
-                                                     ThicknessMold, 
+                                                     Const.ThicknessMold, 
                                                      -Const.MoldWallThickness, 
                                                      -Const.LengthMold))
      
-    MoldBoxInnerRimDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2+Const.MoldWallThickness,
+    MoldBoxInnerRimDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2+Const.MoldWallThickness,
                                                      0,
                                                      0,
-                                                     ThicknessMold-2*Const.MoldWallThickness,
+                                                     Const.ThicknessMold-2*Const.MoldWallThickness,
                                                      -Const.MoldWallThickness, 
                                                      -Const.LengthMold+2*Const.MoldWallThickness))
     
@@ -80,17 +72,17 @@ def createMoldLid(AllCavitiesDimTags):
     #-----------------
     # Create mold lid
     #-----------------
-    MoldLidTopDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2,
+    MoldLidTopDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2,
                                                 -Const.MoldWallThickness,
                                                 Const.MoldWallThickness, 
-                                                ThicknessMold, 
+                                                Const.ThicknessMold, 
                                                 -Const.MoldWallThickness, 
                                                 -Const.LengthMold))
     
-    MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-ThicknessMold/2+Const.MoldWallThickness+Const.MoldCoverTolerance,
+    MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2+Const.MoldWallThickness+Const.MoldCoverTolerance,
                                                      0,
                                                      Const.MoldCoverTolerance, 
-                                                     ThicknessMold-2*Const.MoldWallThickness-2*Const.MoldCoverTolerance,
+                                                     Const.ThicknessMold-2*Const.MoldWallThickness-2*Const.MoldCoverTolerance,
                                                      -Const.MoldWallThickness, 
                                                      -Const.LengthMold+2*Const.MoldWallThickness+2*Const.MoldCoverTolerance))
     
