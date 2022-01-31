@@ -41,3 +41,4 @@ MoldHoleLength = Length/2
 ThicknessMold = 2*OuterRadius + 2*MoldWallThickness
 LengthMold = 3*Length + 2*MoldWallThickness
 HeightMold = Height + FixationWidth + MoldWallThickness    
+MoldHoleLidBorderThickness = 2

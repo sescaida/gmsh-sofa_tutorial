@@ -48,8 +48,19 @@ def makeSegmentStage1Mod(SegmentDimTag, Length, Height, JointHeight, Thickness, 
     Overboarding = 3
     SubstractionDepth = 2.5
     ZOffset = JointStandoff+Stage1DistanceToStandoff
-    BoxSubstractionOuterDimTag = (3,gmsh.model.occ.addBox(-Thickness/2-Overboarding, Stage1DistanceFromBase,-ZOffset, Thickness+2*Overboarding, Height+Overboarding,-(Length-2*ZOffset)))
-    BoxSubstractionInnerDimTag = (3,gmsh.model.occ.addBox(-Thickness/2+SubstractionDepth, Stage1DistanceFromBase,-ZOffset,Thickness-2*SubstractionDepth,Height-(SubstractionDepth+Stage1DistanceFromBase),-(Length-2*ZOffset)))
+    BoxSubstractionOuterDimTag = (3,gmsh.model.occ.addBox(-Thickness/2-Overboarding, 
+                                                          Stage1DistanceFromBase,
+                                                          -ZOffset, 
+                                                          Thickness+2*Overboarding, 
+                                                          Height+Overboarding,
+                                                          -(Length-2*ZOffset)))
+    
+    BoxSubstractionInnerDimTag = (3,gmsh.model.occ.addBox(-Thickness/2+SubstractionDepth, 
+                                                          Stage1DistanceFromBase,
+                                                          -ZOffset,
+                                                          Thickness-2*SubstractionDepth,
+                                                          Height-(SubstractionDepth+Stage1DistanceFromBase),
+                                                          -(Length-2*ZOffset)))
     
     CutOut = gmsh.model.occ.cut([BoxSubstractionOuterDimTag], [BoxSubstractionInnerDimTag])
     SubstractionObjectDimTag = CutOut[0][0]
@@ -60,8 +71,19 @@ def makeSegmentStage1Mod(SegmentDimTag, Length, Height, JointHeight, Thickness, 
     
 def makeSegmentFixationMod(SegmentDimTag, Length, Height, JointHeight, Thickness, JointSlopeAngle, FixationWidth, lc=1):
     
-    BoxFillDimTag = gmsh.model.occ.addBox(-Thickness/2,0,0, Thickness, Height, -Length/2)
-    BoxFixationDimTag = gmsh.model.occ.addBox(-(Thickness/2+FixationWidth),0,0, Thickness+2*FixationWidth, Height+FixationWidth, -FixationWidth)
+    BoxFillDimTag = gmsh.model.occ.addBox(-Thickness/2,
+                                          0,
+                                          0,
+                                          Thickness,
+                                          Height,
+                                          -Length/2)
+    
+    BoxFixationDimTag = gmsh.model.occ.addBox(-(Thickness/2+FixationWidth),
+                                              0,
+                                              0,
+                                              Thickness+2*FixationWidth, 
+                                              Height+FixationWidth,
+                                              -FixationWidth)
     
     BoxesDimTags = [(3,BoxFillDimTag),(3,BoxFixationDimTag)]
     FuseOut = gmsh.model.occ.fuse([SegmentDimTag],BoxesDimTags)
@@ -154,8 +176,19 @@ def createCavityVolume(OuterRadius, NBellowSteps, StepHeight, TeethRadius, WallT
     
     CavityBaseDimTag = FusionOut[0]
         
-    Box1Tag = gmsh.model.occ.addBox(-CenterThickness,0,-(TotalHeight+1),2*CenterThickness,OuterRadius,2*(TotalHeight+1))
-    Box2Tag = gmsh.model.occ.addBox(-OuterRadius, 0, -(TotalHeight+1), 2*OuterRadius, CavityCorkThickness, 2*(TotalHeight+1))
+    Box1Tag = gmsh.model.occ.addBox(-CenterThickness,
+                                    0,
+                                    -(TotalHeight+1),
+                                    2*CenterThickness,
+                                    OuterRadius,
+                                    2*(TotalHeight+1))
+    
+    Box2Tag = gmsh.model.occ.addBox(-OuterRadius,
+                                    0,
+                                    -(TotalHeight+1),
+                                    2*OuterRadius, 
+                                    CavityCorkThickness, 
+                                    2*(TotalHeight+1))
     
     BoxDimTags = [(3,Box1Tag),(3,Box2Tag)]
     
