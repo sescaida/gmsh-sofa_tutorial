@@ -23,13 +23,14 @@ import FingerMoldGeneration
 def createMoldStage2():
     # Fill in the code to create the Stage 2 mold! Hint: Use MoldDimTag and make holes in it. Lid_Stage1_DimTag can be ignored!
     MoldDimTag, Lid_Stage1_DimTag = FingerMoldGeneration.createFingerMold()
-    
+
+    gmsh.model.occ.remove(Lid_Stage1_DimTag)
     # ....
     gmsh.model.occ.synchronize()
     gmsh.model.mesh.generate(2)
     gmsh.model.mesh.refine()
     gmsh.write("MoldStage2.stl")
-    gmsh.fltk.run()    
+    #gmsh.fltk.run()    
     
 
 def createMoldLidStage2():
@@ -86,7 +87,7 @@ def createFingerClamp():
     
   
 
-#createMoldStage2()
+createMoldStage2()
 #createMoldLidStage2()
 #createHoleLidForMoldStage2()
 #creakteMoldForCork()

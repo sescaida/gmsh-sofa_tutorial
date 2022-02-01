@@ -125,7 +125,7 @@ def createMoldLid(AllCavitiesDimTags):
 
 def createMoldParts():    
     
-    MoldDimTag, AllCavitiesDimTags = createFingerMold()
+    MoldDimTag, AllCavitiesDimTags = createFingerMold(Stage1Mod=True)
     LidDimTag = createMoldLid(AllCavitiesDimTags)
     hide_all()
     gmsh.model.setVisibility((LidDimTag,),False, True)
