@@ -54,7 +54,7 @@ def createHoleLidForMoldStage2():
     gmsh.fltk.run()    
         
 def creakteMoldForCork():
-    # Attention: This task is optional and will get you 1 pt extra in your course grade!
+    # Attention: One part of this task is optional and will get you 1 pt extra in your course grade! (see slides)
     # Create a mold to create the cork piece that will seal the cavities! Hint: the code is very similar to what can be found in FingerMoldGeneration.createMoldLid()
     
     # .... 
