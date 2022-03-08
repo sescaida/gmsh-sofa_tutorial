@@ -20,36 +20,7 @@ def createLines(PointTags):
     #print('LineTags: ' + str(LineTags))
     return LineTags  
 
-def createCavity(Radius, NSegments, SegmentHeight, TeethDepth, WallThickness, lc=1):
-    PointTags = np.empty((0,1), int)
-    TotalHeight = SegmentHeight*NSegments
-    
-    YValues = np.linspace(0, TotalHeight, NSegments*2+1)
-    XValues = np.ones(len(YValues)) 
-    XValues[0::2] = Radius
-    XValues[1::2] = Radius-TeethDepth
-    XValues = XValues - WallThickness
-
-    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(0,0,0, lc)])
-    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(XValue, YValue, 0, lc) for (XValue,YValue) in zip(XValues,YValues)])
-    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(0,TotalHeight,0, lc)])
-   
-    LineTags = createLines(PointTags)
-    WireLoop = gmsh.model.occ.addWire(LineTags)
-    SurfaceTag = gmsh.model.occ.addPlaneSurface([WireLoop])
-    
-    RevolveDimTags = gmsh.model.occ.revolve([(2,SurfaceTag)], 0,0,0, 0,1,0, np.pi)
-    HalfDimTag = RevolveDimTags[1]
-    
-    HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
-    gmsh.model.occ.affineTransform(HalfCopyDimTag, [1,0,0,0, 0,1,0,0, 0,0,-1,0])
- 
-    FusionOut = gmsh.model.occ.fuse([HalfDimTag], HalfCopyDimTag)
-    CavityDimTags = FusionOut[0]
-        
-    
-    return CavityDimTags 
-    
+def createCavity(Radius, NSegments, SegmentHeight, TeethDepth, WallThickness, lc=1):    
     
     return CavityDimTags 
     
