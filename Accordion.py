@@ -73,9 +73,10 @@ def createAccordion(Radius, NSegments, SegmentHeight, TeethDepth, WallThickness,
         gmsh.fltk.run()
 
     HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
-    gmsh.model.occ.affineTransform([HalfCopyDimTag], [1,0,0,0, 0,1,0,0, 0,0,-1,0])
+    print("HalfCopyDimTag: ", HalfCopyDimTag )
+    gmsh.model.occ.affineTransform(HalfCopyDimTag, [1,0,0,0, 0,1,0,0, 0,0,-1,0])
  
-    FusionOut = gmsh.model.occ.fuse([HalfDimTag], [HalfCopyDimTag])
+    FusionOut = gmsh.model.occ.fuse([HalfDimTag], HalfCopyDimTag)
     AccordionDimTags = FusionOut[0]
     
     if Step==5:
@@ -126,9 +127,8 @@ def generateGeometry(Step):
     if Step==7 or Step==0:
         gmsh.model.occ.synchronize()
         gmsh.fltk.run()
-    
-        gmsh.model.occ.synchronize()
-#    
+        return
+     
     gmsh.model.mesh.generate(3)
     gmsh.model.occ.synchronize()
     gmsh.write('Accordion_Volumetric.vtk')
