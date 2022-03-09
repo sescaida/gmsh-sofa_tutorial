@@ -6,7 +6,7 @@ path = os.path.dirname(os.path.abspath(__file__))+'/mesh/'
 def createScene(rootNode):
 
                 rootNode.addObject('RequiredPlugin', pluginName='SoftRobots SofaOpenglVisual SofaSparseSolver SofaPreconditioner')
-                rootNode.addObject('VisualStyle', displayFlags='showVisualModels hideBehaviorModels showCollisionModels hideBoundingCollisionModels hideForceFields showInteractionForceFields hideWireframe')
+                rootNode.addObject('VisualStyle', displayFlags='showVisualModels hideBehaviorModels showCollisionModels hideBoundingCollisionModels showForceFields showInteractionForceFields hideWireframe')
 
                 rootNode.addObject('FreeMotionAnimationLoop')
                 rootNode.addObject('GenericConstraintSolver', maxIterations=100, tolerance = 0.0000001)
@@ -37,7 +37,7 @@ def createScene(rootNode):
                 cavity.addObject('MeshSTLLoader', name='loader', filename='Accordion_Cavity.stl')
                 cavity.addObject('MeshTopology', src='@loader', name='topo')
                 cavity.addObject('MechanicalObject', name='cavity')
-                cavity.addObject('SurfacePressureConstraint', triangles='@topo.triangles', value=40, valueType=1)
+                cavity.addObject('SurfacePressureConstraint', triangles='@topo.triangles', value=16, valueType=0)
                 cavity.addObject('BarycentricMapping', name='mapping',  mapForces=False, mapMasses=False)
 
 

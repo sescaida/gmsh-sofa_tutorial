@@ -348,3 +348,5 @@ def createFinger(Stage1Mod=False, lc = 7):
 def createShapes():
     exportCavities()
     FingerDimTag = createFinger(Stage1Mod=False)
+    
+createShapes()

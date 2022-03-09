@@ -69,7 +69,7 @@ class Controller(Sofa.Core.Controller):
             pass
             CurrentCableLength = CurrentCableLength + Increment
             self.CableConstraint.value = [CurrentCableLength.tolist()]
-            self.SerialObj.writelines(CurrentCableLength)
+            #self.SerialObj.writelines(CurrentCableLength)
 
         if (key == "4"):
             pass
