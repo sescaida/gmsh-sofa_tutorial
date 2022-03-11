@@ -351,7 +351,6 @@ def createFinger(Stage1Mod=False, lc = 7):
     gmsh.model.mesh.generate(2)
     gmsh.model.mesh.refine()
     gmsh.write("Finger_Surface.stl")
-    gmsh.fltk.run()
 
     return FingerDimTag
  
@@ -359,5 +358,7 @@ def createFinger(Stage1Mod=False, lc = 7):
 def createShapes():
     exportCavities()
     FingerDimTag = createFinger(Stage1Mod=False)
-    
-createShapes()
+
+if __name__ == '__main__':
+    createShapes()
+    gmsh.fltk.run()

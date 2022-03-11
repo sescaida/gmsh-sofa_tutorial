@@ -133,12 +133,14 @@ def createMoldParts():
     print("MoldDimTag: ", MoldDimTag)
     print("LiddDimTag: ", LidDimTag)
     gmsh.write("Mold.step")    
-    gmsh.model.occ.synchronize()
-    gmsh.fltk.run()
+    gmsh.model.occ.synchronize()    
     return MoldDimTag, LidDimTag
     #gmsh.fltk.run()    
 #    gmsh.model.mesh.generate(2)
 #    gmsh.model.mesh.refine()
 #    gmsh.write("Mold.stl")    
 #    
-#createMoldParts()
+    
+if __name__ == "__main__":
+    createMoldParts()
+    gmsh.fltk.run()

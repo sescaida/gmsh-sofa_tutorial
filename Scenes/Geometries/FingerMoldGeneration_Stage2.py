@@ -42,5 +42,5 @@ def createMoldLid():
     #-----------------
     
 #LidPG = gmsh.model.addPhysicalGroup(3,[LidDimTag])
-    
+
 createMoldLid()
