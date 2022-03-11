@@ -8,6 +8,26 @@ Created on Tue Dec 15 14:56:53 2020
 import gmsh
 import numpy as np
 
+def setMeshingOptions(Width, Depth, Height):
+    lc=4
+    gmsh.model.mesh.field.add("Box", 6)
+    gmsh.model.mesh.field.setNumber(6, "VIn", lc)
+    gmsh.model.mesh.field.setNumber(6, "VOut", lc)
+    gmsh.model.mesh.field.setNumber(6, "XMin", 0)
+    gmsh.model.mesh.field.setNumber(6, "XMax", Width)
+    gmsh.model.mesh.field.setNumber(6, "YMin", 0)
+    gmsh.model.mesh.field.setNumber(6, "YMax", Depth)
+    gmsh.model.mesh.field.setNumber(6, "ZMin", 0)
+    gmsh.model.mesh.field.setNumber(6, "ZMax", Height)    
+    gmsh.model.mesh.field.setNumber(6, "Thickness", 3)
+         
+    gmsh.model.mesh.field.setAsBackgroundMesh(6)
+    
+    gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
+    
+
 def createLines(PointTags):
     
     LineTags = np.empty((0,1),dtype=int)
@@ -144,6 +164,10 @@ def generateGeometry(Step):
     # Generate volumetric and surface meshes for the whole object
     gmsh.model.occ.synchronize()
     gmsh.write('Accordion_Parametric.step')
+    
+    
+    setMeshingOptions(Radius, Radius, TotalHeight)
+    
     gmsh.model.mesh.generate(2)
     gmsh.write('Accordion_Surface.stl')
     

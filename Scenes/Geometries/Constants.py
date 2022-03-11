@@ -9,15 +9,15 @@ Created on Mon Jan 17 11:30:30 2022
 import numpy as np
 
 # Geometric parameters
-Length = 60
+Length = 40
 Height = 20
 JointHeight = 6
-Thickness = 20
+Thickness = 17.5
 JointSlopeAngle = np.deg2rad(30)
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
-NBellowSteps = 1
+NBellowSteps = 3
 StepHeight = 4
 TeethRadius = Thickness/2   
 WallThickness = 3
