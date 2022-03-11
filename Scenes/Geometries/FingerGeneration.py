@@ -15,6 +15,30 @@ locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 gmsh.initialize()
 gmsh.option.setNumber("General.Terminal", 1)
 
+
+def defineMeshSizes(lc=1):   
+    #-------------------
+    # MeshSizes 
+    #-------------------
+
+    gmsh.model.mesh.field.add("Box", 6)
+    gmsh.model.mesh.field.setNumber(6, "VIn", lc)
+    gmsh.model.mesh.field.setNumber(6, "VOut", lc)
+    gmsh.model.mesh.field.setNumber(6, "XMin", -Constants.Thickness)
+    gmsh.model.mesh.field.setNumber(6, "XMax", Constants.Thickness)
+    gmsh.model.mesh.field.setNumber(6, "YMin", 0)
+    gmsh.model.mesh.field.setNumber(6, "YMax", Constants.Height)
+    gmsh.model.mesh.field.setNumber(6, "ZMin", -3*Constants.Length)
+    gmsh.model.mesh.field.setNumber(6, "ZMax", 0)    
+    gmsh.model.mesh.field.setNumber(6, "Thickness", 0.3)
+     
+    gmsh.model.mesh.field.setAsBackgroundMesh(6)
+    
+    gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
+    
+
 def createLines(PointTags):
     
     LineTags = np.empty((0,1),dtype=int)
@@ -222,11 +246,13 @@ def exportCavities(lc=5):
     #-------------------
     # Cavities
     #-------------------   
+    lc = 1
     
     Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)
     gmsh.model.occ.synchronize()
-    gmsh.model.mesh.generate(2)
+    defineMeshSizes(lc)   
+    gmsh.model.mesh.generate(2)        
     gmsh.write("Cavity01.stl")
     
     gmsh.clear()
@@ -235,7 +261,9 @@ def exportCavities(lc=5):
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)
     gmsh.model.occ.affineTransform(Cavity1DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
     gmsh.model.occ.synchronize()
-    gmsh.model.mesh.generate(2)
+    defineMeshSizes(lc)   
+    gmsh.model.mesh.generate(2)    
+    
     gmsh.write("Cavity02.stl")
     
     gmsh.clear()
@@ -243,7 +271,8 @@ def exportCavities(lc=5):
     Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-2*Constants.Length)
     gmsh.model.occ.synchronize()
-    gmsh.model.mesh.generate(2)
+    defineMeshSizes(lc)   
+    gmsh.model.mesh.generate(2)    
     gmsh.write("Cavity03.stl")
     
     gmsh.clear()
@@ -252,7 +281,8 @@ def exportCavities(lc=5):
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-2*Constants.Length)
     gmsh.model.occ.affineTransform(Cavity1DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
     gmsh.model.occ.synchronize()
-    gmsh.model.mesh.generate(2)
+    defineMeshSizes(lc)   
+    gmsh.model.mesh.generate(2)    
     gmsh.write("Cavity04.stl")    
     
     gmsh.clear()
@@ -304,31 +334,12 @@ def createFinger(Stage1Mod=False, lc = 7):
     CutOut = gmsh.model.occ.cut(FingerNoCavitiesDimTag,AllCavitiesDimTags)
     FingerDimTag = CutOut[0][0]
     gmsh.model.occ.synchronize()
-    
-    #-------------------
-    # MeshSizes 
-    #-------------------
-
-    gmsh.model.mesh.field.add("Box", 6)
-    gmsh.model.mesh.field.setNumber(6, "VIn", lc)
-    gmsh.model.mesh.field.setNumber(6, "VOut", lc)
-    gmsh.model.mesh.field.setNumber(6, "XMin", -Constants.Thickness)
-    gmsh.model.mesh.field.setNumber(6, "XMax", Constants.Thickness)
-    gmsh.model.mesh.field.setNumber(6, "YMin", 0)
-    gmsh.model.mesh.field.setNumber(6, "YMax", Constants.Height)
-    gmsh.model.mesh.field.setNumber(6, "ZMin", -3*Constants.Length)
-    gmsh.model.mesh.field.setNumber(6, "ZMax", 0)    
-    gmsh.model.mesh.field.setNumber(6, "Thickness", 0.3)
-     
-    gmsh.model.mesh.field.setAsBackgroundMesh(6)
-    
-    gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
-    
+ 
     #-------------------
     # Export 
     #-------------------
+    
+    defineMeshSizes(lc)
     
     gmsh.model.occ.synchronize()    
     gmsh.write("Finger_Parametric.step")

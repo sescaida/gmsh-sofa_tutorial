@@ -61,7 +61,7 @@ class Controller(Sofa.Core.Controller):
             InitialCavityVolume = self.ModelNode.Cavity01.SurfacePressureConstraint.initialCavityVolume.value
             Cavity01VolumeGrowth = self.SurfacePressureConstraint1.volumeGrowth.value
             GrowthPercent = np.abs(Cavity01VolumeGrowth)/InitialCavityVolume * 100
-            GrowthPerDisplacement = np.abs(Cavity01VolumeGrowth)/CurrentCableLength
+            GrowthPerDisplacement = GrowthPercent/CurrentCableLength
             print("GrowthPercent: ", GrowthPercent)
             print("GrowthPerDisplacement: ", GrowthPerDisplacement)
         
