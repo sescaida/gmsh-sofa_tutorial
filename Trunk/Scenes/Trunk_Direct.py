@@ -28,17 +28,17 @@ class Controller(Sofa.Core.Controller):
         
         self.ModelNode = self.RootNode.model        
         self.CableConstraint = self.ModelNode.cables.cable1.CableConstraint
-        self.ReferenceMO = self.RootNode.ReferenceMONode.ReferenceMO
-        self.StartPosition = np.array(self.ReferenceMO.position.value[0])
-        self.DistanceFromBase = np.abs(self.StartPosition[2])
-        self.CurrentAngle = 0
-        
-        # Cavities
-        self.SurfacePressureConstraint1 = self.ModelNode.Cavity01.SurfacePressureConstraint        
-        self.SurfacePressureConstraint2 = self.ModelNode.Cavity02.SurfacePressureConstraint
-        self.SurfacePressureConstraint3 = self.ModelNode.Cavity03.SurfacePressureConstraint
-        self.SurfacePressureConstraint4 = self.ModelNode.Cavity04.SurfacePressureConstraint
-        
+#        self.ReferenceMO = self.RootNode.ReferenceMONode.ReferenceMO
+#        self.StartPosition = np.array(self.ReferenceMO.position.value[0])
+#        self.DistanceFromBase = np.abs(self.StartPosition[2])
+#        self.CurrentAngle = 0
+#        
+#        # Cavities
+#        self.SurfacePressureConstraint1 = self.ModelNode.Cavity01.SurfacePressureConstraint        
+#        self.SurfacePressureConstraint2 = self.ModelNode.Cavity02.SurfacePressureConstraint
+#        self.SurfacePressureConstraint3 = self.ModelNode.Cavity03.SurfacePressureConstraint
+#        self.SurfacePressureConstraint4 = self.ModelNode.Cavity04.SurfacePressureConstraint
+#        
         
         print('Finished Init')
         
@@ -57,25 +57,25 @@ class Controller(Sofa.Core.Controller):
         print("CurrentCableLength", CurrentCableLength)
         Increment = 1
         
-        if (key == "0"):
-            InitialCavityVolume = self.ModelNode.Cavity01.SurfacePressureConstraint.initialCavityVolume.value
-            Cavity01VolumeGrowth = self.SurfacePressureConstraint1.volumeGrowth.value
-            GrowthPercent = np.abs(Cavity01VolumeGrowth)/InitialCavityVolume * 100
-            GrowthPerDisplacement = GrowthPercent/CurrentCableLength
-            print("GrowthPercent: ", GrowthPercent)
-            print("GrowthPerDisplacement: ", GrowthPerDisplacement)
-        
-        if (key == "6"):
-            pass
-            CurrentCableLength = CurrentCableLength + Increment
-            self.CableConstraint.value = [CurrentCableLength.tolist()]
-            #self.SerialObj.writelines(CurrentCableLength)
-
-        if (key == "4"):
-            pass
-            CurrentCableLength = CurrentCableLength - Increment
-            self.CableConstraint.value = [CurrentCableLength.tolist()]            
-            
+#        if (key == "0"):
+#            InitialCavityVolume = self.ModelNode.Cavity01.SurfacePressureConstraint.initialCavityVolume.value
+#            Cavity01VolumeGrowth = self.SurfacePressureConstraint1.volumeGrowth.value
+#            GrowthPercent = np.abs(Cavity01VolumeGrowth)/InitialCavityVolume * 100
+#            GrowthPerDisplacement = GrowthPercent/CurrentCableLength
+#            print("GrowthPercent: ", GrowthPercent)
+#            print("GrowthPerDisplacement: ", GrowthPerDisplacement)
+#        
+#        if (key == "6"):
+#            pass
+#            CurrentCableLength = CurrentCableLength + Increment
+#            self.CableConstraint.value = [CurrentCableLength.tolist()]
+#            #self.SerialObj.writelines(CurrentCableLength)
+#
+#        if (key == "4"):
+#            pass
+#            CurrentCableLength = CurrentCableLength - Increment
+#            self.CableConstraint.value = [CurrentCableLength.tolist()]            
+#            
 #        ##########################################
 #        # ReferenceMO                            #
 #        ##########################################                
@@ -126,9 +126,9 @@ def createScene(rootNode):
                 rootNode.addObject('PositionalLight', name="light1", color="0.8 0.8 0.8", position="0 60 50")                
                 rootNode.addObject('PositionalLight', name="light2", color="0.8 0.8 0.8", position="0 -60 -50")                               
 
-                VolumetricMeshPath = GeneratedMeshesPath + 'Finger_Volumetric.vtk'
+                VolumetricMeshPath = GeneratedMeshesPath + 'Trunk_Volumetric.vtk'
                                       
-                SurfaceMeshPath = GeneratedMeshesPath + 'Finger_Surface.stl'
+                SurfaceMeshPath = GeneratedMeshesPath + 'Trunk_Surface.stl'
                    
                 
                 model = rootNode.addChild('model')
@@ -151,23 +151,23 @@ def createScene(rootNode):
 
                 model.addObject('LinearSolverConstraintCorrection', name='GCS', solverName='precond')
                 
-                FollowingMONode = model.addChild('FollowingMONode')                
-                FollowingMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=20, showColor=[0,0,1]) # orientation is 240 deg away from scene origin
-                #FollowingMONode.addObject('RestShapeSpringsForceField', name='fixed1', points=[0], external_rest_shape="@../../ReferenceMONode/ReferenceMO", stiffness=1e12)
-                FollowingMONode.addObject("BarycentricMapping")
+#                FollowingMONode = model.addChild('FollowingMONode')                
+#                FollowingMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=20, showColor=[0,0,1]) # orientation is 240 deg away from scene origin
+#                #FollowingMONode.addObject('RestShapeSpringsForceField', name='fixed1', points=[0], external_rest_shape="@../../ReferenceMONode/ReferenceMO", stiffness=1e12)
+#                FollowingMONode.addObject("BarycentricMapping")
 
-                ##########################################
-                # Effector                               #
-                ##########################################                
-                
-                for i in range(1,5):                    
-                    CavitySurfaceMeshPath = GeneratedMeshesPath+'Cavity0' + str(i) + '.stl'                           
-                    CurrentCavity = model.addChild('Cavity0'+str(i))
-                    CurrentCavity.addObject('MeshSTLLoader', name='MeshLoader', filename=CavitySurfaceMeshPath)
-                    CurrentCavity.addObject('Mesh', name='topology', src='@MeshLoader')
-                    CurrentCavity.addObject('MechanicalObject', src="@topology")
-                    CurrentCavity.addObject('SurfacePressureConstraint', template='Vec3d', triangles='@topology.triangles')
-                    CurrentCavity.addObject('BarycentricMapping', name="Mapping", mapForces="false", mapMasses="false")
+#                ##########################################
+#                # Effector                               #
+#                ##########################################                
+#                
+#                for i in range(1,5):                    
+#                    CavitySurfaceMeshPath = GeneratedMeshesPath+'Cavity0' + str(i) + '.stl'                           
+#                    CurrentCavity = model.addChild('Cavity0'+str(i))
+#                    CurrentCavity.addObject('MeshSTLLoader', name='MeshLoader', filename=CavitySurfaceMeshPath)
+#                    CurrentCavity.addObject('Mesh', name='topology', src='@MeshLoader')
+#                    CurrentCavity.addObject('MechanicalObject', src="@topology")
+#                    CurrentCavity.addObject('SurfacePressureConstraint', template='Vec3d', triangles='@topology.triangles')
+#                    CurrentCavity.addObject('BarycentricMapping', name="Mapping", mapForces="false", mapMasses="false")
 
 		        ##########################################
                 # Visualization                          #
@@ -185,13 +185,13 @@ def createScene(rootNode):
                 cables = model.addChild('cables')
                 cable1 = cables.addChild('cable1')
                 
-                NSegments = 3
+                
                 CableHeight = (Const.Height-Const.JointHeight)/2
                 LengthDiagonal = CableHeight/np.cos(Const.JointSlopeAngle)
                 JointStandoff = LengthDiagonal*np.sin(Const.JointSlopeAngle)
                 
                 CablePoints = np.array([])
-                for i in range(NSegments):
+                for i in range(Const.NSegments):
                     SegmentOffsetBase = Const.Length*i
                     SegmentOffsetTip  = Const.Length*(i+1)
                     CablePoints = np.append(CablePoints, [[0,CableHeight+Const.JointHeight,-JointStandoff - SegmentOffsetBase]])
