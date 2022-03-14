@@ -17,6 +17,17 @@ def hide_all():
         #print("x: ", x)
         gmsh.model.setVisibility((x,), False)
 
+def createCableChannel(Length, Thickness):
+    ChannelHeight = 1
+    ChannelThickness = 2
+    ChannelDepth = 3
+    
+    
+    
+
+def createCableChannelCork(Length, Thickness):
+    pass
+    
 
 def createFingerMold(Stage1Mod=False):        
     
@@ -117,6 +128,9 @@ def createMoldLid(AllCavitiesDimTags):
     
     FuseOut = gmsh.model.occ.fuse([MoldLidTopDimTag],[MoldLidInteriorDimTag]+AllCavitiesCorkDimTags+AllCavitiesDimTags)
     LidDimTag = FuseOut[0][0]
+    
+    
+    
     return LidDimTag
 
 #LidPG = gmsh.model.addPhysicalGroup(3,[LidDimTag])
