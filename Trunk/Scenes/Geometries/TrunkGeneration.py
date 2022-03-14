@@ -9,7 +9,7 @@ Created on Thu Jan 13 12:10:07 2022
 import gmsh
 import numpy as np
 import locale
-import Constants
+import Geometries.Constants_Trunk as Constants
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 gmsh.initialize()
@@ -343,7 +343,7 @@ def createTrunk(lc = 7):
 def createShapes():
     exportCavities()    
     FingerDimTag = createTrunk()
-    gmsh.fltk.run()    
+#    gmsh.fltk.run()    
     
 if __name__=="__main__":
     createShapes()

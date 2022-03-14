@@ -10,7 +10,12 @@ import os
 
 GeneratedMeshesPath = os.path.dirname(os.path.abspath(__file__))+'/Geometries/'
 
-import Geometries.Constants as Const
+import Geometries.Constants_Trunk as Const
+import Geometries.TrunkGeneration as Generation
+
+GenerateMeshes = True
+if GenerateMeshes:
+    Generation.createShapes()
 
 class Controller(Sofa.Core.Controller):   
     
@@ -144,7 +149,7 @@ def createScene(rootNode):
                 model.addObject('TetrahedronFEMForceField', template='Vec3d', name='FEM', method='large', poissonRatio=Const.PoissonRation,  youngModulus=Const.YoungsModulus)
 
                 BoxMargin = 3
-                BoxCoords = [-(Const.Thickness/2+BoxMargin), -BoxMargin, BoxMargin, Const.Thickness/2+BoxMargin,Const.Height+2*BoxMargin, -BoxMargin]
+                BoxCoords = [-(Const.Height+2*BoxMargin), -(Const.Height+2*BoxMargin), BoxMargin, Const.Height+2*BoxMargin,Const.Height+2*BoxMargin, -BoxMargin]
                 model.addObject('BoxROI', name='boxROI', box=BoxCoords, drawBoxes=True)
                 model.addObject('RestShapeSpringsForceField', points='@boxROI.indices', stiffness=1e10)               
                 
@@ -199,7 +204,7 @@ def createScene(rootNode):
                 
                 cable1.addObject('MechanicalObject', position=CablePoints.tolist())
                 
-                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=10)                               
+                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*Const.NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=10)                               
                 cable1.addObject('BarycentricMapping')                
                                                 
                 ##########################################
