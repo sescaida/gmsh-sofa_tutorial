@@ -9,7 +9,7 @@ Created on Mon Jan 17 11:30:30 2022
 import numpy as np
 
 # Geometric parameters
-Length = 60
+Length = 40
 Height = 20
 JointHeight = 6
 Thickness = 17.5
@@ -18,9 +18,9 @@ FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
 NBellowSteps = 3
-StepHeight = 5
+StepHeight = 4
 TeethRadius = Thickness/2   
-WallThickness = 3
+WallThickness = 3.5
 CenterThickness = 1.5
 CavityCorkThickness = 3
 
