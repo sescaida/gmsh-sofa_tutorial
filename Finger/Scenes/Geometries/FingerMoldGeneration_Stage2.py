@@ -24,14 +24,21 @@ def createMoldStage2():
     MoldDimTag, Lid_Stage1_DimTag = FingerMoldGeneration.createFingerMold(Stage1Mod=False)
     MoldHole1DimTag = (3,gmsh.model.occ.addBox(-Const.MoldHoleThickness/2,0,Const.MoldHoleLength/2,Const.MoldHoleThickness,2*Const.MoldWallThickness,-Const.MoldHoleLength))    
     MoldHole2DimTag = gmsh.model.occ.copy([MoldHole1DimTag])[0]
+    BoxFixationDimTag = (3,gmsh.model.occ.addBox(-(Const.Thickness/2+Const.FixationWidth),
+                                              -Const.MoldWallThickness,
+                                              2*Const.FixationWidth,
+                                              Const.Thickness+2*Const.FixationWidth, 
+                                              Const.Height+2*Const.FixationWidth,
+                                              -2*Const.FixationWidth))
     gmsh.model.occ.translate([MoldHole1DimTag],0,Const.Height,-1.5*Const.Length)
     gmsh.model.occ.translate([MoldHole2DimTag],0,Const.Height,-2.5*Const.Length)    
-    CutOut = gmsh.model.occ.cut([MoldDimTag], [MoldHole1DimTag, MoldHole2DimTag])
+    CutOut = gmsh.model.occ.cut([MoldDimTag], [MoldHole1DimTag, MoldHole2DimTag,BoxFixationDimTag])
     gmsh.model.occ.synchronize()
     gmsh.write("MoldStage2.step")
     gmsh.model.mesh.generate(2)
     gmsh.model.mesh.refine()
     gmsh.write("MoldStage2.stl")
+    gmsh.fltk.run()
     #MoldWithHolesDimTag = CutOut[0][0]
 
 
@@ -53,6 +60,9 @@ def createMoldLidStage2():
     MoldLidWithHolesDimTag = CutOut[0][0]
     gmsh.model.occ.synchronize()
     gmsh.write("MoldLidStage2.step")
+    gmsh.model.mesh.generate(2)
+    gmsh.model.mesh.refine()
+    gmsh.write("MoldLidStage2.stl")
     gmsh.fltk.run()    
     #-----------------
     # Create cavity cork
@@ -72,6 +82,9 @@ def createHoleLidForMoldStage2():
     FuseOut = gmsh.model.occ.fuse([MoldHole1DimTag],[MoldHoleLidDimTag])
     gmsh.model.occ.synchronize()
     gmsh.write("HoleLidForMoldStage2.step")
+    gmsh.model.mesh.generate(2)
+    gmsh.model.mesh.refine()
+    gmsh.write("HoleLidForMoldStage2.stl")
 
     
 #LidPG = gmsh.model.addPhysicalGroup(3,[LidDimTag])
@@ -107,6 +120,10 @@ def creakteMoldForCork():
     CutOut = gmsh.model.occ.cut([CavityMoldBoxDimTag],[CompleteCorkDimTag])
     gmsh.model.occ.synchronize()
     gmsh.write("MoldForCork.step")
+    gmsh.model.mesh.generate(2)
+    gmsh.model.mesh.refine()
+    gmsh.write("MoldForCork.stl")
+    
     
 def createFingerClamp():
     
@@ -123,6 +140,13 @@ def createFingerClamp():
                                            ClampBoxWidth,
                                            ClampBoxHeight,
                                            ClampBoxLength))
+    ClampBoxCablePassDimTag = (3,gmsh.model.occ.addBox(-Const.Thickness/2, 
+                                                       0,
+                                                       0,
+                                                       Const.Thickness,
+                                                       5,
+                                                       10
+                                                       ))
     
     ScrewRadius = 1.7
     ScrewEarWidth = 6
@@ -153,17 +177,21 @@ def createFingerClamp():
     FuseOut = gmsh.model.occ.fuse([ClampBoxDimDag],[ScrewEarBoxDimDag]+ScrewEarBox2DimTags)
     PositiveBoxDimTag = FuseOut[0][0]
     
-    gmsh.model.occ.cut([PositiveBoxDimTag],FingerDimTags+ScrewCylinder2DimTags + [ScrewCylinderDimTag,CableDimTag])
+    gmsh.model.occ.cut([PositiveBoxDimTag],FingerDimTags+ScrewCylinder2DimTags + [ScrewCylinderDimTag,CableDimTag]+[ClampBoxCablePassDimTag])
     gmsh.write("FingerClamp.step")
-
+    gmsh.model.mesh.generate(2)
+    gmsh.model.mesh.refine()
+    gmsh.write("FingerClamp.stl")
+    
+#
 #createMoldStage2()
-gmsh.clear()
-createMoldLidStage2()
-gmsh.clear()
-createHoleLidForMoldStage2()
-gmsh.clear()
-creakteMoldForCork()
-gmsh.clear()
+#gmsh.clear()
+#createMoldLidStage2()
+#gmsh.clear()
+#createHoleLidForMoldStage2()
+#gmsh.clear()
+#creakteMoldForCork()
+#gmsh.clear()
 createFingerClamp()
 gmsh.model.occ.synchronize()
 gmsh.fltk.run()
