@@ -13,7 +13,7 @@ GeneratedMeshesPath = os.path.dirname(os.path.abspath(__file__))+'/Geometries/'
 import Geometries.Constants_Trunk as Const
 import Geometries.TrunkGeneration as Generation
 
-GenerateMeshes = True
+GenerateMeshes = False
 if GenerateMeshes:
     Generation.createShapes()
 
