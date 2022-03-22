@@ -9,7 +9,7 @@ Created on Thu Jan 13 12:10:07 2022
 import gmsh
 import numpy as np
 import locale
-import Geometries.Constants_Trunk as Constants
+import Constants_Trunk as Constants
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 gmsh.initialize()
@@ -106,7 +106,11 @@ def createSegment(Length, Height, JointHeight, Thickness, JointSlopeAngle,lc=1):
     LineTags = createLines(PointTags)
     WireLoop = gmsh.model.occ.addWire(LineTags)
     SurfaceTag = gmsh.model.occ.addPlaneSurface([WireLoop])
+    
     ExtrudeTags = gmsh.model.occ.extrude([(2,SurfaceTag)],-Thickness,0,0)
+    
+    gmsh.model.occ.synchronize()
+    gmsh.fltk.run()
     print("Segment extrude dim tags:", ExtrudeTags)
     gmsh.model.occ.synchronize()
     
