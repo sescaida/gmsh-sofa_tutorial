@@ -72,11 +72,22 @@ def makeSegmentStage1Mod(SegmentDimTag, Length, Height, JointHeight, Thickness, 
 def makeSegmentFixationMod(SegmentDimTag, Length, Height, JointHeight, Thickness, JointSlopeAngle, FixationWidth, lc=1):
     
     
-    CylinderFillDimTag = (3,gmsh.model.occ.addCylinder(0,0,0, 0,0,-Length/2, Height,angle=np.pi))
-    CylinderFixationDimTag = (3,gmsh.model.occ.addCylinder(0,0,0, 0,0,-FixationWidth, Height+FixationWidth,angle=np.pi))
-    gmsh.model.occ.rotate([CylinderFillDimTag,CylinderFixationDimTag],0,0,0,0,0,1, np.pi/2)
-    gmsh.model.occ.synchronize()    
-    FuseOut = gmsh.model.occ.fuse([SegmentDimTag],[CylinderFillDimTag,CylinderFixationDimTag])
+    BoxFillDimTag = gmsh.model.occ.addBox(-Thickness/2,
+                                          0,
+                                          0,
+                                          Thickness,
+                                          Height,
+                                          -Length/2)
+    
+    BoxFixationDimTag = gmsh.model.occ.addBox(-(Thickness/2+FixationWidth),
+                                              0,
+                                              0,
+                                              Thickness+2*FixationWidth, 
+                                              Height+FixationWidth,
+                                              -FixationWidth)
+    
+    BoxesDimTags = [(3,BoxFillDimTag),(3,BoxFixationDimTag)]
+    FuseOut = gmsh.model.occ.fuse([SegmentDimTag],BoxesDimTags)
     SegmentDimTag = FuseOut[0][0]
     return SegmentDimTag
     
@@ -90,16 +101,16 @@ def createSegment(Length, Height, JointHeight, Thickness, JointSlopeAngle,lc=1):
     YValues = np.array([0,0,JointHeight,Height,Height,JointHeight])
     ZValues = np.array([0,-Length,-Length, -Length+JointStandoff,-JointStandoff,0])
     
-    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(0, YValue, ZValue, lc) for (YValue,ZValue) in zip(YValues,ZValues)])
+    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(Thickness/2, YValue, ZValue, lc) for (YValue,ZValue) in zip(YValues,ZValues)])
     
     LineTags = createLines(PointTags)
     WireLoop = gmsh.model.occ.addWire(LineTags)
     SurfaceTag = gmsh.model.occ.addPlaneSurface([WireLoop])
-    RevolveTags = gmsh.model.occ.revolve([(2,SurfaceTag)],0,0,0,0,0,1,np.pi)
-    print("Segment extrude dim tags:", RevolveTags)
+    ExtrudeTags = gmsh.model.occ.extrude([(2,SurfaceTag)],-Thickness,0,0)
+    print("Segment extrude dim tags:", ExtrudeTags)
     gmsh.model.occ.synchronize()
     
-    return RevolveTags[1]
+    return ExtrudeTags[1]
 
 def createArticulationBellow(OuterRadius, NBellowSteps, StepHeight, TeethRadius, FingerWidth, lc=1):
     
