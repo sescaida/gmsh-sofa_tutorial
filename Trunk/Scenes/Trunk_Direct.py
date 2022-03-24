@@ -10,12 +10,16 @@ import os
 
 GeneratedMeshesPath = os.path.dirname(os.path.abspath(__file__))+'/Geometries/'
 
-import Geometries.Constants_Trunk as Const
-import Geometries.TrunkGeneration as Generation
+import Geometries.ConstantsTrunk as Const
 
-GenerateMeshes = True
-if GenerateMeshes:
-    Generation.createShapes()
+#import Geometries.TrunkGeneration as Generation
+#
+#GenerateMeshes = False
+#if GenerateMeshes:
+#    Generation.createShapes()
+def CircularBufferAccess(Buffer, idx):
+    NElements = len(Buffer)
+    return Buffer[idx%NElements]
 
 class Controller(Sofa.Core.Controller):   
     
@@ -32,18 +36,17 @@ class Controller(Sofa.Core.Controller):
         self.begun = False
         
         self.ModelNode = self.RootNode.model        
-        self.CableConstraint = self.ModelNode.cables.cable1.CableConstraint
-#        self.ReferenceMO = self.RootNode.ReferenceMONode.ReferenceMO
-#        self.StartPosition = np.array(self.ReferenceMO.position.value[0])
-#        self.DistanceFromBase = np.abs(self.StartPosition[2])
-#        self.CurrentAngle = 0
-#        
-#        # Cavities
-#        self.SurfacePressureConstraint1 = self.ModelNode.Cavity01.SurfacePressureConstraint        
-#        self.SurfacePressureConstraint2 = self.ModelNode.Cavity02.SurfacePressureConstraint
-#        self.SurfacePressureConstraint3 = self.ModelNode.Cavity03.SurfacePressureConstraint
-#        self.SurfacePressureConstraint4 = self.ModelNode.Cavity04.SurfacePressureConstraint
-#        
+        self.Cables = self.ModelNode.cables
+        self.Cable1_0 =self.Cables.cable1_0
+        self.Cable1_1 =self.Cables.cable1_1
+        self.Cable1_2 =self.Cables.cable1_2
+        #self.Cable1_3 =self.Cables.cable1_3
+        self.CablesSect1 = [self.Cable1_0, self.Cable1_1, self.Cable1_2]
+        self.Cable2_0 =self.Cables.cable2_0
+        self.Cable2_1 =self.Cables.cable2_1
+        self.Cable2_2 =self.Cables.cable2_2
+        #self.Cable2_3 =self.Cables.cable2_3
+        self.CablesSect2 = [self.Cable2_0, self.Cable2_1, self.Cable2_2]
         
         print('Finished Init')
         
@@ -53,16 +56,81 @@ class Controller(Sofa.Core.Controller):
         
     def onKeypressedEvent(self, c):
         key = c['key']        
+        
+        Limits = np.array([0, np.deg2rad(120), np.deg2rad(240)])
+
             
         ##########################################
         # Cable                                  #
         ##########################################                
         
-        CurrentCableLength = np.array(self.CableConstraint.value.value[0])
-        print("CurrentCableLength", CurrentCableLength)
-        Increment = 1
+#        CurrentCableLength = np.array(self.CableConstraint.value.value[0])
+#        print("CurrentCableLength", CurrentCableLength)
+#        Increment = 1
+#        
+        if (key == "0"):
+#            InputStr = input("Enter desired cable configuration! ")
+            InputStr = '210,600,60,600'
+            SplitStr = InputStr.split(',')
+            
+            Angle1 = np.deg2rad(float(SplitStr[0]))
+            Displacement1 = float(SplitStr[1])
+            Angle2 = np.deg2rad(float(SplitStr[2]))
+            Displacement2 = float(SplitStr[3])
+
+            AngleDistance = np.deg2rad(120)
+            
+                  
+            for cable in self.CablesSect1:
+                cable.CableConstraint.value.value = [0]
+            
+            Angle1BaseIdx = int(np.argmax(((Limits-Angle1)>0)))-1
+            Weight1 = (Angle1-Limits[Angle1BaseIdx])/AngleDistance
+            
+             
+            print("Idx: {}".format(Angle1BaseIdx))
+            print("Weight1: {}".format(Weight1))
+            
+            print("Section 1: {}".format(self.CablesSect1[Angle1BaseIdx].CableConstraint.value.value))
+            
+            Disp1_0 = (1-Weight1)*Displacement1
+            Disp1_1 = Weight1*Displacement1
+            
+            print("Disp1_0: {}".format(Disp1_0))
+            print("Disp1_1: {}".format(Disp1_1))
+            
+            self.CablesSect1[Angle1BaseIdx].CableConstraint.value.value = [Disp1_0]
+            CircularBufferAccess(self.CablesSect1, Angle1BaseIdx+1).CableConstraint.value.value = [Disp1_1]     
+#            for cable in self.CablesSect1:
+#                cable.CableConstraint.value.value = [0]
+##                
+#            self.CablesSect1[Angle1BaseIdx].CableConstraint.value.value = [(1-Weight)*Displacement1]
+#            CircularBufferAccess(self.CablesSect1, Angle1BaseIdx+1).CableConstraint.value.value = [Weight*Displacement1]    
+#            
+#            
+            
+            for cable in self.CablesSect2:
+                cable.CableConstraint.value.value = [0]
+            
+            Angle2BaseIdx = int(np.argmax(((Limits-Angle2)>0)))-1
+            Weight = (Angle2-Limits[Angle2BaseIdx])/AngleDistance
+            
+             
+            print("Idx: {}".format(Angle2BaseIdx))
+            print("Weight: {}".format(Weight))
+            
+            print("Section 2: {}".format(self.CablesSect2[Angle2BaseIdx].CableConstraint.value.value))
+            
+            Disp2_0 = (1-Weight)*Displacement2
+            Disp2_1 = Weight*Displacement2
+            
+            print("Disp2_0: {}".format(Disp2_0))
+            print("Disp2_1: {}".format(Disp2_1))
+            
+            self.CablesSect2[Angle2BaseIdx].CableConstraint.value.value = [Disp2_0]
+            CircularBufferAccess(self.CablesSect2, Angle2BaseIdx+1).CableConstraint.value.value = [Disp2_1]   
+            
         
-#        if (key == "0"):
 #            InitialCavityVolume = self.ModelNode.Cavity01.SurfacePressureConstraint.initialCavityVolume.value
 #            Cavity01VolumeGrowth = self.SurfacePressureConstraint1.volumeGrowth.value
 #            GrowthPercent = np.abs(Cavity01VolumeGrowth)/InitialCavityVolume * 100
@@ -188,24 +256,30 @@ def createScene(rootNode):
                 ##########################################
                 
                 cables = model.addChild('cables')
-                cable1 = cables.addChild('cable1')
                 
                 
                 CableHeight = (Const.Height-Const.JointHeight)/2
                 LengthDiagonal = CableHeight/np.cos(Const.JointSlopeAngle)
                 JointStandoff = LengthDiagonal*np.sin(Const.JointSlopeAngle)
+                AngleCables = np.deg2rad(120)
+                CableRadius = CableHeight+Const.JointHeight
                 
-                CablePoints = np.array([])
-                for i in range(Const.NSegments):
-                    SegmentOffsetBase = Const.Length*i
-                    SegmentOffsetTip  = Const.Length*(i+1)
-                    CablePoints = np.append(CablePoints, [[0,CableHeight+Const.JointHeight,-JointStandoff - SegmentOffsetBase]])
-                    CablePoints = np.append(CablePoints, [[0,CableHeight+Const.JointHeight, JointStandoff - SegmentOffsetTip]])
-                
-                cable1.addObject('MechanicalObject', position=CablePoints.tolist())
-                
-                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*Const.NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=10)                               
-                cable1.addObject('BarycentricMapping')                
+                for k in range(1,Const.NSections+1):
+                    for i in range(0,3):
+                        cable = cables.addChild('cable'+str(k)+'_'+str(i))
+                    
+                        CablePoints = np.empty((0,3))
+                        NSegments = k * Const.NSegmentsPerSection
+                        AngleOffset = k*np.deg2rad(0)
+                        for j in range(NSegments):
+                            SegmentOffsetBase = Const.Length*j
+                            SegmentOffsetTip  = Const.Length*(j+1)
+                            CablePoints = np.append(CablePoints, [[np.cos(AngleCables*i+AngleOffset)*CableRadius, np.sin(AngleCables*i+AngleOffset)*CableRadius,-JointStandoff - SegmentOffsetBase]],axis=0)
+                            CablePoints = np.append(CablePoints, [[np.cos(AngleCables*i+AngleOffset)*CableRadius, np.sin(AngleCables*i+AngleOffset)*CableRadius, JointStandoff - SegmentOffsetTip]],axis=0)
+                        print("CablePoints: {}".format(CablePoints))
+                        cable.addObject('MechanicalObject', position=CablePoints.tolist())
+                        cable.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(0,CablePoints.shape[0])), pullPoint=[np.cos(AngleCables*i+AngleOffset)*CableRadius, np.sin(AngleCables*i+AngleOffset)*CableRadius,10], printLog=True, value=0, valueType='force')                               
+                        cable.addObject('BarycentricMapping')                
                                                 
                 ##########################################
                 # Moving Point                           #
