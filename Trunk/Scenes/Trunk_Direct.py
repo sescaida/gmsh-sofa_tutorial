@@ -97,15 +97,7 @@ class Controller(Sofa.Core.Controller):
        
         if (key=='2'):
             self.Angle1 = (self.Angle1-self.AngleIncrement)%(2*np.pi)
-       
-            
-        if (key == "0"):
-            self.Angle1 = 0 
-            self.Force1 = 0
-            self.Angle2 = 0
-            self.Force2 = 0 
-            
-            
+                   
         if (key=='4'):
             self.Force2 += self.ForceIncrement
        
