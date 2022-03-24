@@ -40,15 +40,32 @@ class Controller(Sofa.Core.Controller):
         self.Cable1_0 =self.Cables.cable1_0
         self.Cable1_1 =self.Cables.cable1_1
         self.Cable1_2 =self.Cables.cable1_2
-        #self.Cable1_3 =self.Cables.cable1_3
+        
         self.CablesSect1 = [self.Cable1_0, self.Cable1_1, self.Cable1_2]
         self.Cable2_0 =self.Cables.cable2_0
         self.Cable2_1 =self.Cables.cable2_1
         self.Cable2_2 =self.Cables.cable2_2
-        #self.Cable2_3 =self.Cables.cable2_3
+    
         self.CablesSect2 = [self.Cable2_0, self.Cable2_1, self.Cable2_2]
         
+        self.Angle1 = 0 
+        self.Displacement1 = 0
+        self.Angle2 = 0
+        self.Displacement2 = 0 
+        
+        self.AngleIncrement = np.deg2rad(10)
+        self.ForceIncrement = 100
+
+        
         print('Finished Init')
+      
+    def printConfiguration(self):
+        print("------")
+        print('Current configuration')
+        print("Angle1: {}".format(self.Angle1))
+        print("Angle2: {}".format(self.Angle2))
+        print("Displacement1: {}".format(self.Displacement1))
+        print("Displacement21: {}".format(self.Displacement2))
         
     def onAnimateBeginEvent(self, eventType):
         pass
@@ -67,119 +84,95 @@ class Controller(Sofa.Core.Controller):
 #        CurrentCableLength = np.array(self.CableConstraint.value.value[0])
 #        print("CurrentCableLength", CurrentCableLength)
 #        Increment = 1
-#        
+        
+        if (key=='+'):
+            self.Displacement1 += self.ForceIncrement
+       
+        if (key=='-'):
+            self.Displacement1 -= self.ForceIncrement
+       
+#       
+        if (key=='1'):
+            self.Angle1 = (self.Angle1+self.AngleIncrement)%(2*np.pi)
+       
+        if (key=='2'):
+            self.Angle1 = (self.Angle1-self.AngleIncrement)%(2*np.pi)
+       
+            
         if (key == "0"):
+            self.Angle1 = 0 
+            self.Displacement1 = 0
+            self.Angle2 = 0
+            self.Displacement2 = 0 
+            
+            
+        if (key=='4'):
+            self.Displacement2 += self.ForceIncrement
+       
+        if (key=='5'):
+            self.Displacement2 -= self.ForceIncrement
+       
+#       
+        if (key=='7'):
+            self.Angle2 = (self.Angle2+self.AngleIncrement)%(2*np.pi)
+       
+        if (key=='8'):
+            self.Angle2 = (self.Angle2-self.AngleIncrement)%(2*np.pi)
+       
+            
+        if (key == "0"):
+            self.Angle1 = 0 
+            self.Displacement1 = 0
+            self.Angle2 = 0
+            self.Displacement2 = 0 
+        
 #            InputStr = input("Enter desired cable configuration! ")
-            InputStr = '210,600,60,600'
-            SplitStr = InputStr.split(',')
             
-            Angle1 = np.deg2rad(float(SplitStr[0]))
-            Displacement1 = float(SplitStr[1])
-            Angle2 = np.deg2rad(float(SplitStr[2]))
-            Displacement2 = float(SplitStr[3])
-
-            AngleDistance = np.deg2rad(120)
-            
-                  
-            for cable in self.CablesSect1:
-                cable.CableConstraint.value.value = [0]
-            
-            Angle1BaseIdx = int(np.argmax(((Limits-Angle1)>0)))-1
-            Weight1 = (Angle1-Limits[Angle1BaseIdx])/AngleDistance
-            
-             
-            print("Idx: {}".format(Angle1BaseIdx))
-            print("Weight1: {}".format(Weight1))
-            
-            print("Section 1: {}".format(self.CablesSect1[Angle1BaseIdx].CableConstraint.value.value))
-            
-            Disp1_0 = (1-Weight1)*Displacement1
-            Disp1_1 = Weight1*Displacement1
-            
-            print("Disp1_0: {}".format(Disp1_0))
-            print("Disp1_1: {}".format(Disp1_1))
-            
-            self.CablesSect1[Angle1BaseIdx].CableConstraint.value.value = [Disp1_0]
-            CircularBufferAccess(self.CablesSect1, Angle1BaseIdx+1).CableConstraint.value.value = [Disp1_1]     
-#            for cable in self.CablesSect1:
-#                cable.CableConstraint.value.value = [0]
-##                
-#            self.CablesSect1[Angle1BaseIdx].CableConstraint.value.value = [(1-Weight)*Displacement1]
-#            CircularBufferAccess(self.CablesSect1, Angle1BaseIdx+1).CableConstraint.value.value = [Weight*Displacement1]    
-#            
-#            
-            
-            for cable in self.CablesSect2:
-                cable.CableConstraint.value.value = [0]
-            
-            Angle2BaseIdx = int(np.argmax(((Limits-Angle2)>0)))-1
-            Weight = (Angle2-Limits[Angle2BaseIdx])/AngleDistance
-            
-             
-            print("Idx: {}".format(Angle2BaseIdx))
-            print("Weight: {}".format(Weight))
-            
-            print("Section 2: {}".format(self.CablesSect2[Angle2BaseIdx].CableConstraint.value.value))
-            
-            Disp2_0 = (1-Weight)*Displacement2
-            Disp2_1 = Weight*Displacement2
-            
-            print("Disp2_0: {}".format(Disp2_0))
-            print("Disp2_1: {}".format(Disp2_1))
-            
-            self.CablesSect2[Angle2BaseIdx].CableConstraint.value.value = [Disp2_0]
-            CircularBufferAccess(self.CablesSect2, Angle2BaseIdx+1).CableConstraint.value.value = [Disp2_1]   
-            
+        self.printConfiguration()   
+        AngleDistance = np.deg2rad(120)
         
-#            InitialCavityVolume = self.ModelNode.Cavity01.SurfacePressureConstraint.initialCavityVolume.value
-#            Cavity01VolumeGrowth = self.SurfacePressureConstraint1.volumeGrowth.value
-#            GrowthPercent = np.abs(Cavity01VolumeGrowth)/InitialCavityVolume * 100
-#            GrowthPerDisplacement = GrowthPercent/CurrentCableLength
-#            print("GrowthPercent: ", GrowthPercent)
-#            print("GrowthPerDisplacement: ", GrowthPerDisplacement)
+              
+        for cable in self.CablesSect1:
+            cable.CableConstraint.value.value = [0]
+        
+        self.Angle1BaseIdx = int(np.argmax(((Limits-self.Angle1)>0)))-1
+        Weight1 = (self.Angle1-Limits[self.Angle1BaseIdx])/AngleDistance
+        
+#         
+#        print("Idx: {}".format(self.Angle1BaseIdx))
+#        print("Weight1: {}".format(Weight1))
 #        
-#        if (key == "6"):
-#            pass
-#            CurrentCableLength = CurrentCableLength + Increment
-#            self.CableConstraint.value = [CurrentCableLength.tolist()]
-#            #self.SerialObj.writelines(CurrentCableLength)
-#
-#        if (key == "4"):
-#            pass
-#            CurrentCableLength = CurrentCableLength - Increment
-#            self.CableConstraint.value = [CurrentCableLength.tolist()]            
-#            
-#        ##########################################
-#        # ReferenceMO                            #
-#        ##########################################                
+#        print("Section 1: {}".format(self.CablesSect1[self.Angle1BaseIdx].CableConstraint.value.value))
 #        
-#        CurrentPosition = np.array(self.ReferenceMO.position.value[0])
-#        
-#        self.DistanceFromBase
-#        
-#        print("CurrentPosition", CurrentPosition)
-#        Increment = np.deg2rad(5)
-#        
-#        if (key == "2"):
-#            pass
-#            self.CurrentAngle +=  Increment
-#            # Axes are inverted with respect to standard references
-#            X = self.DistanceFromBase * np.sin(self.CurrentAngle)
-#            Z = -self.DistanceFromBase * np.cos(self.CurrentAngle)
-#            NewPosition = np.array([X+self.StartPosition[0],self.StartPosition[1],Z]) 
-#            self.ReferenceMO.position.value = [NewPosition.tolist()]            
-#        
-#        if (key == "8"):
-#            pass
-#            self.CurrentAngle -=  Increment
-#            # Axes are inverted with respect to standard references
-#            X = self.DistanceFromBase * np.sin(self.CurrentAngle)
-#            Z = -self.DistanceFromBase * np.cos(self.CurrentAngle)
-#            NewPosition = np.array([X+self.StartPosition[0],self.StartPosition[1],Z]) 
-#            self.ReferenceMO.position.value = [NewPosition.tolist()]            
+        Disp1_0 = np.cos(Weight1*np.pi/2)*self.Displacement1
+        Disp1_1 = np.sin(Weight1*np.pi/2)*self.Displacement1
+        
+#        print("Disp1_0: {}".format(Disp1_0))
+#        print("Disp1_1: {}".format(Disp1_1))
+        self.CablesSect1[self.Angle1BaseIdx].CableConstraint.value.value = [Disp1_0]
+        CircularBufferAccess(self.CablesSect1, self.Angle1BaseIdx+1).CableConstraint.value.value = [Disp1_1]     
 
         
+        for cable in self.CablesSect2:
+            cable.CableConstraint.value.value = [0]
         
+        self.Angle2BaseIdx = int(np.argmax(((Limits-self.Angle2)>0)))-1
+        Weight2 = (self.Angle2-Limits[self.Angle2BaseIdx])/AngleDistance
+         
+#        print("Idx: {}".format(self.Angle2BaseIdx))
+#        print("Weight: {}".format(Weight))
+#        
+#        print("Section 2: {}".format(self.CablesSect2[self.Angle2BaseIdx].CableConstraint.value.value))
+        
+        Disp2_0 = np.cos(Weight2*np.pi/2)*self.Displacement2
+        Disp2_1 = np.sin(Weight2*np.pi/2)*self.Displacement2
+        
+#        print("Disp2_0: {}".format(Disp2_0))
+#        print("Disp2_1: {}".format(Disp2_1))
+#        
+        self.CablesSect2[self.Angle2BaseIdx].CableConstraint.value.value = [Disp2_0]
+        CircularBufferAccess(self.CablesSect2, self.Angle2BaseIdx+1).CableConstraint.value.value = [Disp2_1]              
+    
 
 def createScene(rootNode):
 
