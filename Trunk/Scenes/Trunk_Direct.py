@@ -49,12 +49,12 @@ class Controller(Sofa.Core.Controller):
         self.CablesSect2 = [self.Cable2_0, self.Cable2_1, self.Cable2_2]
         
         self.Angle1 = 0 
-        self.Displacement1 = 0
+        self.Force1 = 0
         self.Angle2 = 0
-        self.Displacement2 = 0 
+        self.Force2 = 0 
         
         self.AngleIncrement = np.deg2rad(10)
-        self.ForceIncrement = 100
+        self.ForceIncrement = 50
 
         
         print('Finished Init')
@@ -64,8 +64,8 @@ class Controller(Sofa.Core.Controller):
         print('Current configuration')
         print("Angle1: {}".format(self.Angle1))
         print("Angle2: {}".format(self.Angle2))
-        print("Displacement1: {}".format(self.Displacement1))
-        print("Displacement21: {}".format(self.Displacement2))
+        print("Displacement1: {}".format(self.Force1))
+        print("Displacement21: {}".format(self.Force2))
         
     def onAnimateBeginEvent(self, eventType):
         pass
@@ -86,10 +86,10 @@ class Controller(Sofa.Core.Controller):
 #        Increment = 1
         
         if (key=='+'):
-            self.Displacement1 += self.ForceIncrement
+            self.Force1 += self.ForceIncrement
        
         if (key=='-'):
-            self.Displacement1 -= self.ForceIncrement
+            self.Force1 -= self.ForceIncrement
        
 #       
         if (key=='1'):
@@ -101,16 +101,16 @@ class Controller(Sofa.Core.Controller):
             
         if (key == "0"):
             self.Angle1 = 0 
-            self.Displacement1 = 0
+            self.Force1 = 0
             self.Angle2 = 0
-            self.Displacement2 = 0 
+            self.Force2 = 0 
             
             
         if (key=='4'):
-            self.Displacement2 += self.ForceIncrement
+            self.Force2 += self.ForceIncrement
        
         if (key=='5'):
-            self.Displacement2 -= self.ForceIncrement
+            self.Force2 -= self.ForceIncrement
        
 #       
         if (key=='7'):
@@ -122,9 +122,9 @@ class Controller(Sofa.Core.Controller):
             
         if (key == "0"):
             self.Angle1 = 0 
-            self.Displacement1 = 0
+            self.Force1 = 0
             self.Angle2 = 0
-            self.Displacement2 = 0 
+            self.Force2 = 0 
         
 #            InputStr = input("Enter desired cable configuration! ")
             
@@ -144,13 +144,13 @@ class Controller(Sofa.Core.Controller):
 #        
 #        print("Section 1: {}".format(self.CablesSect1[self.Angle1BaseIdx].CableConstraint.value.value))
 #        
-        Disp1_0 = np.cos(Weight1*np.pi/2)*self.Displacement1
-        Disp1_1 = np.sin(Weight1*np.pi/2)*self.Displacement1
+        Force1_0 = np.cos(Weight1*np.pi/2)*self.Force1
+        Force1_1 = np.sin(Weight1*np.pi/2)*self.Force1
         
-#        print("Disp1_0: {}".format(Disp1_0))
-#        print("Disp1_1: {}".format(Disp1_1))
-        self.CablesSect1[self.Angle1BaseIdx].CableConstraint.value.value = [Disp1_0]
-        CircularBufferAccess(self.CablesSect1, self.Angle1BaseIdx+1).CableConstraint.value.value = [Disp1_1]     
+#        print("Force1_0: {}".format(Force1_0))
+#        print("Force1_1: {}".format(Force1_1))
+        self.CablesSect1[self.Angle1BaseIdx].CableConstraint.value.value = [Force1_0]
+        CircularBufferAccess(self.CablesSect1, self.Angle1BaseIdx+1).CableConstraint.value.value = [Force1_1]     
 
         
         for cable in self.CablesSect2:
@@ -164,14 +164,14 @@ class Controller(Sofa.Core.Controller):
 #        
 #        print("Section 2: {}".format(self.CablesSect2[self.Angle2BaseIdx].CableConstraint.value.value))
         
-        Disp2_0 = np.cos(Weight2*np.pi/2)*self.Displacement2
-        Disp2_1 = np.sin(Weight2*np.pi/2)*self.Displacement2
+        Force2_0 = np.cos(Weight2*np.pi/2)*self.Force2
+        Force2_1 = np.sin(Weight2*np.pi/2)*self.Force2
         
-#        print("Disp2_0: {}".format(Disp2_0))
-#        print("Disp2_1: {}".format(Disp2_1))
+#        print("Force2_0: {}".format(Force2_0))
+#        print("Force2_1: {}".format(Force2_1))
 #        
-        self.CablesSect2[self.Angle2BaseIdx].CableConstraint.value.value = [Disp2_0]
-        CircularBufferAccess(self.CablesSect2, self.Angle2BaseIdx+1).CableConstraint.value.value = [Disp2_1]              
+        self.CablesSect2[self.Angle2BaseIdx].CableConstraint.value.value = [Force2_0]
+        CircularBufferAccess(self.CablesSect2, self.Angle2BaseIdx+1).CableConstraint.value.value = [Force2_1]              
     
 
 def createScene(rootNode):

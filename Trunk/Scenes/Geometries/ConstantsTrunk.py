@@ -16,7 +16,7 @@ Length = 40
 Height = 20
 JointHeight = 6
 Thickness = 17.5
-JointSlopeAngle = np.deg2rad(30)
+JointSlopeAngle = np.deg2rad(45)
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
