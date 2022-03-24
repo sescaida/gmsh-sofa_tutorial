@@ -9,7 +9,7 @@ Created on Thu Jan 13 12:10:07 2022
 import gmsh
 import numpy as np
 import locale
-import Constants_Trunk as Constants
+import ConstantsTrunk as Constants
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 gmsh.initialize()
