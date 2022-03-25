@@ -64,8 +64,8 @@ class Controller(Sofa.Core.Controller):
         print('Current configuration')
         print("Angle1: {}".format(self.Angle1))
         print("Angle2: {}".format(self.Angle2))
-        print("Displacement1: {}".format(self.Force1))
-        print("Displacement21: {}".format(self.Force2))
+        print("Force1 (Tension): {}".format(self.Force1))
+        print("Force2 (Tension): {}".format(self.Force2))
         
     def onAnimateBeginEvent(self, eventType):
         pass

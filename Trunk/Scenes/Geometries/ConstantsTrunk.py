@@ -10,13 +10,13 @@ import numpy as np
 
 # Geometric parameters
 NSections = 2
-NSegmentsPerSection = 4
+NSegmentsPerSection = 3
 NSegments = NSections * NSegmentsPerSection
-Length = 40
+Length = 42
 Height = 20
 JointHeight = 6
 Thickness = 17.5
-JointSlopeAngle = np.deg2rad(45)
+JointSlopeAngle = np.deg2rad(50)
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
