@@ -10,7 +10,7 @@ import numpy as np
 
 # Geometric parameters
 NSections = 2
-NSegmentsPerSection = 4
+NSegmentsPerSection = 5
 NSegments = NSections * NSegmentsPerSection
 Length = 40
 Height = 20
