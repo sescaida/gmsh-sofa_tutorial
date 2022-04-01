@@ -4,6 +4,6 @@ This tutorial/toolbox was tested with Gmsh 4.9.3 [1] and the SOFA v21.12 binarie
 
 [1] Install using pip ($pip install gmsh)
 
-[2] https://www.sofa-framework.org/download/2
+[2] https://www.sofa-framework.org/download/
 
 [3] https://github.com/sofa-framework/sofa/releases/tag/v21.12.00
