@@ -16,7 +16,7 @@ gmsh.initialize()
 gmsh.option.setNumber("General.Terminal", 1)
 
 
-def defineMeshSizes(lc=1):   
+def defineMeshSizes(lc=0.5):   
     #-------------------
     # MeshSizes 
     #-------------------
@@ -246,7 +246,7 @@ def exportCavities(lc=5):
     #-------------------
     # Cavities
     #-------------------   
-    lc = 1
+    lc = 0.5
     
     Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellowSteps, Constants.StepHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
     gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)

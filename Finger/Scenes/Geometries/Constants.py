@@ -17,12 +17,12 @@ JointSlopeAngle = np.deg2rad(30)
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
-NBellowSteps = 3
+NBellowSteps = 1
 StepHeight = 4
 TeethRadius = Thickness/2   
 WallThickness = 3.5
 CenterThickness = 1.5
-CavityCorkThickness = 3
+CavityCorkThickness = 4
 
 # Elasticity parameters
 PoissonRation = 0.3

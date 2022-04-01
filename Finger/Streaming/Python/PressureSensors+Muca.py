@@ -24,6 +24,7 @@ cols = 4
 rows = 2
 
 fig = plt.figure()
+fig.suptitle('Capacitive Sensor Data', fontsize=16)
 im = plt.imshow(np.empty((rows,cols)),cmap='gray', vmin=0, vmax=700, animated=True)
 Back = np.zeros((rows,cols))
 Matrix = np.zeros((rows,cols))

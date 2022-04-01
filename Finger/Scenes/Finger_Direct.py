@@ -186,7 +186,7 @@ def createScene(rootNode):
                 cable1 = cables.addChild('cable1')
                 
                 NSegments = 3
-                CableHeight = (Const.Height-Const.JointHeight)/2
+                CableHeight = 2*(Const.Height-Const.JointHeight)/3
                 LengthDiagonal = CableHeight/np.cos(Const.JointSlopeAngle)
                 JointStandoff = LengthDiagonal*np.sin(Const.JointSlopeAngle)
                 
