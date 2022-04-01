@@ -11,6 +11,6 @@ This tutorial/toolbox was tested with Gmsh 4.9.3 [1] and the SOFA v21.12 binarie
 
 ## First Steps
 
-Before being able to launch any Scene, the corresponding geometries have to be created. For instance, for the finger, you need to run the script "FingerGeneration.py" found in the folder Finger/Scenes/Geometries. In the same folder, the script "Constants.py" contains the parameters that describe the finger. After generation, the simulation can be launched, e.g. "$runSofa Finger_Direct.py" in the folder Finger/Scenes.
+Before being able to launch any Scene, the corresponding geometries have to be created. For instance, for the finger, you need to run the corresponding script, i.e. "$python3 FingerGeneration.py", found in the folder Finger/Scenes/Geometries. In the same folder, the script "Constants.py" contains the parameters that describe the finger. After generation, the simulation can be launched, e.g. "$runSofa Finger_Direct.py" in the folder Finger/Scenes.
 
 ## Fabrication
