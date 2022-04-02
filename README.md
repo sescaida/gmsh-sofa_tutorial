@@ -14,7 +14,7 @@ At this time, the tutorial/toolbox is being developed standalone, but it might b
 
 ## First Steps
 
-Before being able to launch any scene, the corresponding geometries have to be created. For instance, for the finger, you need to run the corresponding script, i.e. "$python3 FingerGeneration.py", found in the folder Finger/Scenes/Geometries. In the same folder, the script "Constants.py" contains the parameters that describe the finger. After generation, the simulation can be launched, e.g. "$runSofa Finger_Direct.py" in the folder Finger/Scenes.
+Before being able to launch any scene, the geometries have to be created. For instance, for the finger, you need to run the corresponding script, i.e. "$python3 FingerGeneration.py", found in the folder Finger/Scenes/Geometries. In the same folder, the script "Constants.py" contains the parameters that describe the finger. After generation, the simulation can be launched, e.g. "$runSofa Finger_Direct.py" in the folder Finger/Scenes.
 
 ## Fabrication
 For the finger, in the folder Finger/Scenes/Geometries, you will find the scripts needed to generate the molds. A more in depth explanation will be provided in the future.
