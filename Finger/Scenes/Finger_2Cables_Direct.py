@@ -27,7 +27,8 @@ class Controller(Sofa.Core.Controller):
         self.begun = False
         
         self.ModelNode = self.RootNode.model        
-        self.CableConstraint = self.ModelNode.cables.cable1.CableConstraint
+        self.CableConstraint1 = self.ModelNode.cables.cable1.CableConstraint
+        self.CableConstraint2 = self.ModelNode.cables.cable2.CableConstraint
         self.ReferenceMO = self.RootNode.ReferenceMONode.ReferenceMO
         self.StartPosition = np.array(self.ReferenceMO.position.value[0])
         self.DistanceFromBase = np.abs(self.StartPosition[2])
@@ -53,28 +54,43 @@ class Controller(Sofa.Core.Controller):
         # Cable                                  #
         ##########################################                
         
-        CurrentCableLength = np.array(self.CableConstraint.value.value[0])
-        print("CurrentCableLength", CurrentCableLength)
+        CurrentCableLength1 = np.array(self.CableConstraint1.value.value[0])
+        print("CurrentCableLength1", CurrentCableLength1)
+        
+        CurrentCableLength2 = np.array(self.CableConstraint2.value.value[0])
+        print("CurrentCableLength2", CurrentCableLength2)
         Increment = 1
         
         if (key == "0"):
             InitialCavityVolume = self.ModelNode.Cavity01.SurfacePressureConstraint.initialCavityVolume.value
             Cavity01VolumeGrowth = self.SurfacePressureConstraint1.volumeGrowth.value
             GrowthPercent = np.abs(Cavity01VolumeGrowth)/InitialCavityVolume * 100
-            GrowthPerDisplacement = GrowthPercent/CurrentCableLength
+            GrowthPerDisplacement = GrowthPercent/CurrentCableLength1
             print("GrowthPercent: ", GrowthPercent)
             print("GrowthPerDisplacement: ", GrowthPerDisplacement)
         
         if (key == "6"):
             pass
-            CurrentCableLength = CurrentCableLength + Increment
-            self.CableConstraint.value = [CurrentCableLength.tolist()]
-            #self.SerialObj.writelines(CurrentCableLength)
+            CurrentCableLength1 = CurrentCableLength1 + Increment
+            self.CableConstraint1.value = [CurrentCableLength1.tolist()]
+            #self.SerialObj.writelines(CurrentCableLength1)
 
         if (key == "4"):
             pass
-            CurrentCableLength = CurrentCableLength - Increment
-            self.CableConstraint.value = [CurrentCableLength.tolist()]            
+            CurrentCableLength1 = CurrentCableLength1 - Increment
+            self.CableConstraint1.value = [CurrentCableLength1.tolist()]            
+            
+            
+        if (key == "9"):
+            pass
+            CurrentCableLength2 = CurrentCableLength2 + Increment
+            self.CableConstraint2.value = [CurrentCableLength2.tolist()]
+            #self.SerialObj.writelines(CurrentCableLength1)
+
+        if (key == "7"):
+            pass
+            CurrentCableLength2 = CurrentCableLength2 - Increment
+            self.CableConstraint2.value = [CurrentCableLength2.tolist()]            
             
 #        ##########################################
 #        # ReferenceMO                            #
