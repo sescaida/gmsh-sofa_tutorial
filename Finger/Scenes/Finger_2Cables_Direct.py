@@ -184,25 +184,43 @@ def createScene(rootNode):
                 # Cable Actuation                        #
                 ##########################################
                 
-                cables = model.addChild('cables')
-                cable1 = cables.addChild('cable1')
+                cables = model.addChild('cables')                
                 
                 NSegments = 3
                 CableHeight = 2*(Const.Height-Const.JointHeight)/3
                 LengthDiagonal = CableHeight/np.cos(Const.JointSlopeAngle)
                 JointStandoff = LengthDiagonal*np.sin(Const.JointSlopeAngle)
+                CableDistance = Const.CableDistance
+                
+                # Cable 1
                 
                 CablePoints = np.array([])
                 for i in range(NSegments):
                     SegmentOffsetBase = Const.Length*i
                     SegmentOffsetTip  = Const.Length*(i+1)
-                    CablePoints = np.append(CablePoints, [[0,CableHeight+Const.JointHeight,-JointStandoff - SegmentOffsetBase]])
-                    CablePoints = np.append(CablePoints, [[0,CableHeight+Const.JointHeight, JointStandoff - SegmentOffsetTip]])
+                    CablePoints = np.append(CablePoints, [[-CableDistance/2,CableHeight+Const.JointHeight,-JointStandoff - SegmentOffsetBase]])
+                    CablePoints = np.append(CablePoints, [[-CableDistance/2,CableHeight+Const.JointHeight, JointStandoff - SegmentOffsetTip]])
                 
+                cable1 = cables.addChild('cable1')
                 cable1.addObject('MechanicalObject', position=CablePoints.tolist())
                 
                 cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=10)                               
                 cable1.addObject('BarycentricMapping')                
+                
+                # Cable 2
+                
+                CablePoints = np.array([])
+                for i in range(NSegments):
+                    SegmentOffsetBase = Const.Length*i
+                    SegmentOffsetTip  = Const.Length*(i+1)
+                    CablePoints = np.append(CablePoints, [[CableDistance/2,CableHeight+Const.JointHeight,-JointStandoff - SegmentOffsetBase]])
+                    CablePoints = np.append(CablePoints, [[CableDistance/2,CableHeight+Const.JointHeight, JointStandoff - SegmentOffsetTip]])
+                
+                cable2 = cables.addChild('cable2')
+                cable2.addObject('MechanicalObject', position=CablePoints.tolist())
+                
+                cable2.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=10)                               
+                cable2.addObject('BarycentricMapping')                
                                                 
                 ##########################################
                 # Moving Point                           #
