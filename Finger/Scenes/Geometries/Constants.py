@@ -17,8 +17,8 @@ JointSlopeAngle = np.deg2rad(45)
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
-NBellowSteps = 1
-StepHeight = 4
+NBellows = 3
+BellowHeight = 4
 TeethRadius = Thickness/2   
 WallThickness = 3.5
 CenterThickness = 1.5
