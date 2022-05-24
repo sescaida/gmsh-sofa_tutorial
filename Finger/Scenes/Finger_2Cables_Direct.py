@@ -37,9 +37,7 @@ class Controller(Sofa.Core.Controller):
         # Cavities
         self.SurfacePressureConstraint1 = self.ModelNode.Cavity01.SurfacePressureConstraint        
         self.SurfacePressureConstraint2 = self.ModelNode.Cavity02.SurfacePressureConstraint
-        self.SurfacePressureConstraint3 = self.ModelNode.Cavity03.SurfacePressureConstraint
-        self.SurfacePressureConstraint4 = self.ModelNode.Cavity04.SurfacePressureConstraint
-        
+
         
         print('Finished Init')
         
@@ -127,7 +125,7 @@ class Controller(Sofa.Core.Controller):
 def createScene(rootNode):
 
                 print('asd')
-                rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots EigenLinearSolvers')
+                rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots')
                 rootNode.addObject('VisualStyle', displayFlags='hideWireframe showBehaviorModels hideCollisionModels hideBoundingCollisionModels showForceFields showInteractionForceFields')
 
                 rootNode.findData('gravity').value = [0, 0, -9810] #
@@ -148,10 +146,10 @@ def createScene(rootNode):
                    
                 
                 model = rootNode.addChild('model')
-                model.addObject('EulerImplicit', name='odesolver')
+                model.addObject('EulerImplicit', name='odesolver', rayleighStiffness=0.1)
                 #model.addObject('PCGLinearSolver', name='linearSolver',iterations='25', tolerance='1.0e-9', preconditioners="precond")
-                #model.addObject('SparseLDLSolver', name='precond')
-                model.addObject('EigenSimplicialLDLT', name='precond', template="CompressedRowSparseMatrixMat3x3d")
+                model.addObject('SparseLDLSolver', name='precond')
+                #model.addObject('EigenSimplicialLDLT', name='precond', template="CompressedRowSparseMatrixMat3x3d")
 
                 model.addObject('MeshVTKLoader', name='loader', filename=VolumetricMeshPath, scale3d=[1, 1, 1])
                 model.addObject('TetrahedronSetTopologyContainer', src='@loader', name='container')
@@ -178,7 +176,7 @@ def createScene(rootNode):
                 # Effector                               #
                 ##########################################                
                 
-                for i in range(1,5):                    
+                for i in range(1,3):                    
                     CavitySurfaceMeshPath = GeneratedMeshesPath+'Cavity0' + str(i) + '.stl'                           
                     CurrentCavity = model.addChild('Cavity0'+str(i))
                     CurrentCavity.addObject('MeshSTLLoader', name='MeshLoader', filename=CavitySurfaceMeshPath)
@@ -207,13 +205,14 @@ def createScene(rootNode):
                 LengthDiagonal = CableHeight/np.cos(Const.JointSlopeAngle)
                 JointStandoff = LengthDiagonal*np.sin(Const.JointSlopeAngle)
                 CableDistance = Const.CableDistance
+                BellowGap = Const.BellowHeight * (Const.NBellows-1)
                 
                 # Cable 1
                 
                 CablePoints = np.array([])
                 for i in range(NSegments):
-                    SegmentOffsetBase = Const.Length*i
-                    SegmentOffsetTip  = Const.Length*(i+1)
+                    SegmentOffsetBase = (Const.Length+BellowGap)*i
+                    SegmentOffsetTip  = Const.Length*(i+1)+BellowGap*i
                     CablePoints = np.append(CablePoints, [[-CableDistance/2,CableHeight+Const.JointHeight,-JointStandoff - SegmentOffsetBase]])
                     CablePoints = np.append(CablePoints, [[-CableDistance/2,CableHeight+Const.JointHeight, JointStandoff - SegmentOffsetTip]])
                 
@@ -227,8 +226,8 @@ def createScene(rootNode):
                 
                 CablePoints = np.array([])
                 for i in range(NSegments):
-                    SegmentOffsetBase = Const.Length*i
-                    SegmentOffsetTip  = Const.Length*(i+1)
+                    SegmentOffsetBase = (Const.Length+BellowGap)*i
+                    SegmentOffsetTip  = Const.Length*(i+1)+BellowGap*i
                     CablePoints = np.append(CablePoints, [[CableDistance/2,CableHeight+Const.JointHeight,-JointStandoff - SegmentOffsetBase]])
                     CablePoints = np.append(CablePoints, [[CableDistance/2,CableHeight+Const.JointHeight, JointStandoff - SegmentOffsetTip]])
                 
