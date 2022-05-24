@@ -135,38 +135,47 @@ def createSegment(Length, Height, JointHeight, Thickness, JointSlopeAngle,lc=1):
     
     return ExtrudeTags[1]
 
-def createArticulationBellow(OuterRadius, NBellows, BellowHeight, TeethRadius, FingerWidth, lc=1,PlateauHeight=0.5):
+def createArticulationBellow(OuterRadius, NBellows, BellowHeight, TeethRadius, FingerWidth, PlateauHeight, lc=1):
     
     PointTags = np.empty((0,1), int)
     
-    TotalHeight = NBellows * (BellowHeight+PlateauHeight)
-    ZValues = np.linspace(0, TotalHeight, 2*NBellows+1)
-    NPoints = len(ZValues)
-    XValues = np.ones((NPoints,))
-    XValues[0::3] = OuterRadius
-    XValues[1::3] = OuterRadius
-    XValues[2::3] = TeethRadius
-     
-    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(0,0,0, lc)])
-    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(XValue, 0, ZValue, lc) for (XValue,ZValue) in zip(XValues,ZValues)])
-    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(0,0,TotalHeight, lc)])
+    DiagonalStepHeight = (BellowHeight - PlateauHeight)/2
+    TotalBellowHeight = NBellows*BellowHeight
+    
+    XValueIn = TeethRadius     
+    XValueOut = OuterRadius 
+    
+    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(0, 0, 0, lc)])
+    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(XValueIn, 0, 0, lc)])
+    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(XValueOut, 0, DiagonalStepHeight, lc)])
+    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(XValueOut, 0, DiagonalStepHeight+PlateauHeight, lc)])
+    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(XValueIn, 0, BellowHeight, lc)])
+    PointTags = np.append(PointTags, [gmsh.model.occ.addPoint(0, 0, BellowHeight, lc)])    
 
     LineTags = createLines(PointTags)
     WireLoop = gmsh.model.occ.addWire(LineTags)
-    SurfaceTag = gmsh.model.occ.addPlaneSurface([WireLoop])
+    SurfaceTag = gmsh.model.occ.addPlaneSurface([WireLoop])                
     
     RevolveDimTags = gmsh.model.occ.revolve([(2,SurfaceTag)], 0,0,0, 0,0,1, np.pi)
-    HalfDimTag = RevolveDimTags[1]
-    
-    HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
-    gmsh.model.occ.affineTransform(HalfCopyDimTag, [1,0,0,0, 0,1,0,0, 0,0,-1,0])
- 
-    FusionOut = gmsh.model.occ.fuse([HalfDimTag], HalfCopyDimTag)
-    BellowDimTag = FusionOut[0]
-        
-    return BellowDimTag
+    SingleBellowDimTag = RevolveDimTags[1]    
 
-def createCavitySketch(OuterRadius, BellowHeight, TeethRadius, WallThickness, CenterThickness, lc=1, PlateauHeight=0.5):
+    Copies = []
+    for i in range(1,NBellows):
+        CopyDimTags = gmsh.model.occ.copy([SingleBellowDimTag])
+        gmsh.model.occ.translate(CopyDimTags,0,0,i*BellowHeight)
+        Copies.append(CopyDimTags[0])
+    
+ 
+    FuseOut = gmsh.model.occ.fuse([SingleBellowDimTag], Copies)
+    BellowDimTags = FuseOut[0]    
+    print("BellowDimTag: {}".format(BellowDimTags))
+    gmsh.model.occ.translate(BellowDimTags,0,0,-TotalBellowHeight/2)
+#    gmsh.model.occ.synchronize()
+#    gmsh.fltk.run()
+#    exit()   
+    return BellowDimTags
+
+def createCavitySketch(OuterRadius, BellowHeight, TeethRadius, WallThickness, CenterThickness, PlateauHeight, lc=1 ):
     
     
     PointTags = np.empty((0,1), int)
@@ -192,16 +201,15 @@ def createCavitySketch(OuterRadius, BellowHeight, TeethRadius, WallThickness, Ce
 def createCavityVolume(OuterRadius, NBellows, BellowHeight, TeethRadius, WallThickness, CenterThickness, CavityCorkThickness, lc=1):
     
     TotalHeight = NBellows * BellowHeight
-    SurfaceTag = createCavitySketch(OuterRadius, BellowHeight, TeethRadius, WallThickness, CenterThickness)
+    SurfaceTag = createCavitySketch(OuterRadius, BellowHeight, TeethRadius, WallThickness, CenterThickness, Constants.PlateauHeight)
     RevolveDimTags = gmsh.model.occ.revolve([(2,SurfaceTag)], 0,0,0, 0,0,1, np.pi)
     CavityDimTag = RevolveDimTags[1]
     
     Copies = []
-    for i in range(0,NBellows-1):        
+    for i in range(1,NBellows):        
         HalfCopyDimTag = gmsh.model.occ.copy([CavityDimTag])
         Copies.append(HalfCopyDimTag[0])
-        gmsh.model.occ.translate(HalfCopyDimTag, 0,0,(i+1)*BellowHeight)        
- 
+        gmsh.model.occ.translate(HalfCopyDimTag, 0,0,i*BellowHeight)         
     
     FusionOut = gmsh.model.occ.fuse([CavityDimTag], Copies)
       
@@ -219,19 +227,19 @@ def createCavityVolume(OuterRadius, NBellows, BellowHeight, TeethRadius, WallThi
     CutOut = gmsh.model.occ.cut(CavityBaseDimTag,[BoxDimTag])
     print("CutOut: ", CutOut)
     CavityDimTags = CutOut[0]
-
-    gmsh.model.occ.synchronize()
-    gmsh.fltk.run()
-    exit()    
+    
+#    gmsh.model.occ.synchronize()
+#    gmsh.fltk.run()
     return CavityDimTags
 
 def createAllCavities(OuterRadius, NBellows, BellowHeight, TeethRadius, WallThickness, CenterThickness,lc=1):
     
+    BellowGap = (NBellows-1)*BellowHeight
     Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellows, Constants.BellowHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
-    gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)
+    gmsh.model.occ.translate(Cavity1DimTags,0,0,-(Constants.Length+BellowGap/2))
     Cavity2DimTags = gmsh.model.occ.copy(Cavity1DimTags)        
     
-    gmsh.model.occ.translate(Cavity2DimTags,0,0,-Constants.Length)
+    gmsh.model.occ.translate(Cavity2DimTags,0,0,-(Constants.Length+BellowGap))
     
     gmsh.model.occ.synchronize()
     AllCavitiesDimTags = Cavity1DimTags + Cavity2DimTags 
@@ -302,20 +310,21 @@ def createFinger(Stage1Mod=False, lc = 7):
 #    gmsh.model.occ.synchronize()
 #    gmsh.fltk.run()
 #       
-    gmsh.model.occ.translate(Segment2DimTags,0,0,-Constants.Length)
-    gmsh.model.occ.translate(Segment3DimTags,0,0,-2*Constants.Length)    
+    BellowGap = Constants.BellowHeight*(Constants.NBellows-1)
+    gmsh.model.occ.translate(Segment2DimTags,0,0,-(BellowGap+Constants.Length))
+    gmsh.model.occ.translate(Segment3DimTags,0,0,-2*(BellowGap+Constants.Length))    
     
     #-------------------
     # Bellows
     #-------------------           
     
-    Bellow1DimTag = createArticulationBellow(Constants.OuterRadius, Constants.NBellows, Constants.BellowHeight, Constants.TeethRadius, Constants.Thickness, lc=lc)
-    Bellow2DimTags = gmsh.model.occ.copy(Bellow1DimTag)
+    Bellow1DimTags = createArticulationBellow(Constants.OuterRadius, Constants.NBellows, Constants.BellowHeight, Constants.TeethRadius, Constants.Thickness, Constants.PlateauHeight, lc=lc)
+    Bellow2DimTags = gmsh.model.occ.copy(Bellow1DimTags)
 
-    gmsh.model.occ.translate(Bellow1DimTag,0,0,-Constants.Length)
-    gmsh.model.occ.translate(Bellow2DimTags,0,0,-2*Constants.Length)
+    gmsh.model.occ.translate(Bellow1DimTags,0,0,-(BellowGap/2+Constants.Length))
+    gmsh.model.occ.translate(Bellow2DimTags,0,0,-2*(3*BellowGap/4+Constants.Length))
     
-    FuseOut = gmsh.model.occ.fuse(Bellow1DimTag,[Segment1DimTag]+Segment2DimTags + Segment3DimTags + Bellow2DimTags)
+    FuseOut = gmsh.model.occ.fuse(Bellow1DimTags,[Segment1DimTag]+Segment2DimTags + Segment3DimTags + Bellow2DimTags)
     FingerNoCavitiesDimTag = FuseOut[0]
     gmsh.model.occ.synchronize()
     

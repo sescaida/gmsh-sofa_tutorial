@@ -17,12 +17,13 @@ JointSlopeAngle = np.deg2rad(45)
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
-NBellows = 3
-BellowHeight = 4
+NBellows = 1
+BellowHeight = 8
 TeethRadius = Thickness/2   
 WallThickness = 3.5
 CenterThickness = 1.5
-CavityCorkThickness = 4
+CavityCorkThickness = 3
+PlateauHeight = 2
 
 # Elasticity parameters
 PoissonRation = 0.3
