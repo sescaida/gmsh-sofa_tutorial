@@ -266,42 +266,23 @@ def exportCavities(lc=5):
     #-------------------   
     lc = 0.5
     
+    BellowGap = (Constants.NBellows-1)*Constants.BellowHeight
+    
     Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellows, Constants.BellowHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
-    gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)
+    gmsh.model.occ.translate(Cavity1DimTags,0,0,-(Constants.Length+BellowGap/2))
     gmsh.model.occ.synchronize()
     defineMeshSizes(lc)   
     gmsh.model.mesh.generate(2)        
     gmsh.write("Cavity01.stl")
     
     gmsh.clear()
-    
-    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellows, Constants.BellowHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)    
-    gmsh.model.occ.translate(Cavity1DimTags,0,0,-Constants.Length)
-    gmsh.model.occ.affineTransform(Cavity1DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
-    gmsh.model.occ.synchronize()
-    defineMeshSizes(lc)   
-    gmsh.model.mesh.generate(2)    
-    
-    gmsh.write("Cavity02.stl")
-    
-    gmsh.clear()
-    
+
     Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellows, Constants.BellowHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)
-    gmsh.model.occ.translate(Cavity1DimTags,0,0,-2*Constants.Length)
+    gmsh.model.occ.translate(Cavity1DimTags,0,0,-2*(Constants.Length+3/4*BellowGap))
     gmsh.model.occ.synchronize()
     defineMeshSizes(lc)   
     gmsh.model.mesh.generate(2)    
-    gmsh.write("Cavity03.stl")
-    
-    gmsh.clear()
-    
-    Cavity1DimTags = createCavityVolume(Constants.OuterRadius, Constants.NBellows, Constants.BellowHeight, Constants.TeethRadius, Constants.WallThickness, Constants.CenterThickness, Constants.CavityCorkThickness, lc=lc)    
-    gmsh.model.occ.translate(Cavity1DimTags,0,0,-2*Constants.Length)
-    gmsh.model.occ.affineTransform(Cavity1DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
-    gmsh.model.occ.synchronize()
-    defineMeshSizes(lc)   
-    gmsh.model.mesh.generate(2)    
-    gmsh.write("Cavity04.stl")    
+    gmsh.write("Cavity02.stl")  
     
     gmsh.clear()
     
