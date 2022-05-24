@@ -160,14 +160,20 @@ def createArticulationBellow(OuterRadius, NBellows, BellowHeight, TeethRadius, F
     SingleBellowDimTag = RevolveDimTags[1]    
 
     Copies = []
-    for i in range(1,NBellows):
-        CopyDimTags = gmsh.model.occ.copy([SingleBellowDimTag])
-        gmsh.model.occ.translate(CopyDimTags,0,0,i*BellowHeight)
-        Copies.append(CopyDimTags[0])
+    BellowDimTags = None
     
- 
-    FuseOut = gmsh.model.occ.fuse([SingleBellowDimTag], Copies)
-    BellowDimTags = FuseOut[0]    
+    if NBellows > 1:
+        for i in range(1,NBellows):
+            CopyDimTags = gmsh.model.occ.copy([SingleBellowDimTag])
+            gmsh.model.occ.translate(CopyDimTags,0,0,i*BellowHeight)
+            Copies.append(CopyDimTags[0])
+        
+     
+        FuseOut = gmsh.model.occ.fuse([SingleBellowDimTag], Copies)
+        BellowDimTags = FuseOut[0]    
+    else:
+        BellowDimTags = [SingleBellowDimTag]
+        
     print("BellowDimTag: {}".format(BellowDimTags))
     gmsh.model.occ.translate(BellowDimTags,0,0,-TotalBellowHeight/2)
 #    gmsh.model.occ.synchronize()
@@ -205,15 +211,19 @@ def createCavityVolume(OuterRadius, NBellows, BellowHeight, TeethRadius, WallThi
     RevolveDimTags = gmsh.model.occ.revolve([(2,SurfaceTag)], 0,0,0, 0,0,1, np.pi)
     CavityDimTag = RevolveDimTags[1]
     
+    CavityBaseDimTag = None    
     Copies = []
-    for i in range(1,NBellows):        
-        HalfCopyDimTag = gmsh.model.occ.copy([CavityDimTag])
-        Copies.append(HalfCopyDimTag[0])
-        gmsh.model.occ.translate(HalfCopyDimTag, 0,0,i*BellowHeight)         
-    
-    FusionOut = gmsh.model.occ.fuse([CavityDimTag], Copies)
-      
-    CavityBaseDimTag = FusionOut[0]
+    if NBellows > 1:
+        for i in range(1,NBellows):        
+            HalfCopyDimTag = gmsh.model.occ.copy([CavityDimTag])
+            Copies.append(HalfCopyDimTag[0])
+            gmsh.model.occ.translate(HalfCopyDimTag, 0,0,i*BellowHeight)         
+        
+        FusionOut = gmsh.model.occ.fuse([CavityDimTag], Copies)
+          
+        CavityBaseDimTag = FusionOut[0]
+    else:
+        CavityBaseDimTag = [CavityDimTag]
     
     gmsh.model.occ.translate(CavityBaseDimTag,0,0,-TotalHeight/2)
     
