@@ -14,6 +14,7 @@ locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 gmsh.initialize()
 gmsh.option.setNumber("General.Terminal", 1)
+gmsh.option.setNumber("Mesh.MeshSizeFactor", 10)
 
 
 def defineMeshSizes(lc=0.5):   

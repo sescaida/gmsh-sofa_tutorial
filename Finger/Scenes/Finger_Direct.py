@@ -4,8 +4,6 @@ import SofaRuntime
 import os
 import numpy as np
 
-
-
 import os
 
 GeneratedMeshesPath = os.path.dirname(os.path.abspath(__file__))+'/Geometries/'

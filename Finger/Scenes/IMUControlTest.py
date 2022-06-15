@@ -11,7 +11,7 @@ import serial
 import numpy as np
 FileMotorCommands = "MotorCommands.txt"
 FileIMUData = "IMUData.txt"
-SerialObj = serial.Serial("/dev/ttyACM0", 115200,timeout=0.1)
+SerialObj = serial.Serial("/dev/ttyACM1", 115200,timeout=0.1)
 OldMotorValues = np.zeros(3, dtype=int)
 DesiredMotorValues = OldMotorValues
 while True:
