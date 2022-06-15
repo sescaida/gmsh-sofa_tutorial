@@ -4,6 +4,7 @@ import SofaRuntime
 import os
 import sys
 import numpy as np
+import serial
 
 
 import os
@@ -19,6 +20,7 @@ class Controller(Sofa.Core.Controller):
         print(" Python::__init__::" + str(self.name.value))
         
         self.RootNode = kwargs['RootNode']
+#        self.SerialObj = kwargs['SerialObj']
         print(kwargs['RootNode'])
         
         self.Counter = 0
@@ -28,21 +30,33 @@ class Controller(Sofa.Core.Controller):
         
         self.ModelNode = self.RootNode.model        
         self.CableConstraint = self.ModelNode.cables.cable1.CableConstraint
-        self.ReferenceMO = self.RootNode.ReferenceMONode.ReferenceMO
-        self.StartPosition = np.array(self.ReferenceMO.position.value[0])
-        self.DistanceFromBase = np.abs(self.StartPosition[2])
+        #self.ReferenceMO = self.RootNode.ReferenceMONode.ReferenceMO
+        #self.StartPosition = np.array(self.ReferenceMO.position.value[0])
+        #self.DistanceFromBase = np.abs(self.StartPosition[2])
         self.CurrentAngle = 0
         
         # Cavities
         self.SurfacePressureConstraint1 = self.ModelNode.Cavity01.SurfacePressureConstraint        
         self.SurfacePressureConstraint2 = self.ModelNode.Cavity02.SurfacePressureConstraint
         self.SurfacePressureConstraint3 = self.ModelNode.Cavity03.SurfacePressureConstraint
-        self.SurfacePressureConstraint4 = self.ModelNode.Cavity04.SurfacePressureConstraint
+        self.SurfacePressureConstraint4 = self.ModelNode.Cavity04.SurfacePressureConstraint        
         
+        
+        self.FileIMUData = "IMUData.txt"
+        self.IMUData = None
+        self.FileMotorCommands = "MotorCommands.txt"
+        np.savetxt(self.FileMotorCommands, [0,0,0],fmt='%i')
         
         print('Finished Init')
         
     def onAnimateBeginEvent(self, eventType):
+#        print("packetIn: {}".format(self.SerialObj.packetIn.value))
+        try:
+            self.IMUData = np.loadtxt(self.FileIMUData)
+        except:
+            "Error while reading IMU data"
+        
+        print("IMUData: {}".format(self.IMUData))        
         pass
   
         
@@ -75,7 +89,17 @@ class Controller(Sofa.Core.Controller):
             pass
             CurrentCableLength = CurrentCableLength - Increment
             self.CableConstraint.value = [CurrentCableLength.tolist()]            
-            
+
+
+        CableLengthInt = 5*int(self.CableConstraint.value[0])            
+        DesiredMotorValues = np.array([CableLengthInt, CableLengthInt, CableLengthInt],dtype=int)
+        np.savetxt(self.FileMotorCommands, DesiredMotorValues,fmt='%i')
+#        print("sending commands to servos ...")        
+#        String = str(DesiredMotorValues[0]) + ' ' + str(DesiredMotorValues[1]) + ' ' + str(DesiredMotorValues[2]) + '\n'
+#        ByteString = String.encode('ASCII')
+#        print("Sending to the motors: {}".format(ByteString))
+#        self.SerialObj.write(ByteString)        
+#        print("sent commands to servos ...")
 #        ##########################################
 #        # ReferenceMO                            #
 #        ##########################################                
@@ -153,10 +177,10 @@ def createScene(rootNode):
 
                 model.addObject('LinearSolverConstraintCorrection', name='GCS', solverName='precond')
                 
-                FollowingMONode = model.addChild('FollowingMONode')                
-                FollowingMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=20, showColor=[0,0,1]) # orientation is 240 deg away from scene origin
-                #FollowingMONode.addObject('RestShapeSpringsForceField', name='fixed1', points=[0], external_rest_shape="@../../ReferenceMONode/ReferenceMO", stiffness=1e12)
-                FollowingMONode.addObject("BarycentricMapping")
+#                FollowingMONode = model.addChild('FollowingMONode')                
+#                FollowingMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=20, showColor=[0,0,1]) # orientation is 240 deg away from scene origin
+#                #FollowingMONode.addObject('RestShapeSpringsForceField', name='fixed1', points=[0], external_rest_shape="@../../ReferenceMONode/ReferenceMO", stiffness=1e12)
+#                FollowingMONode.addObject("BarycentricMapping")
 
                 ##########################################
                 # Effector                               #
@@ -201,19 +225,24 @@ def createScene(rootNode):
                 
                 cable1.addObject('MechanicalObject', position=CablePoints.tolist())
                 
-                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=10)                               
+                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=0)                               
                 cable1.addObject('BarycentricMapping')                
                                                 
                 ##########################################
                 # Moving Point                           #
                 ##########################################
-                ReferenceMONode = rootNode.addChild('ReferenceMONode')
-                
-                ReferenceMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=10) # orientation is 240 deg away from scene origin
+#                ReferenceMONode = rootNode.addChild('ReferenceMONode')
+#                
+#                ReferenceMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=10) # orientation is 240 deg away from scene origin
 
                 ##########################################
                 # Controller                             #
                 ##########################################
+#                serialport='/dev/ttyACM0'
+#                SerialObj = rootNode.addObject("SerialPortBridgeGeneric", port=serialport, baudRate=115200, size=3, listening=True, receive=True, header=255)
+#                rootNode.addObject(Controller(name="ActuationController", RootNode=rootNode, SerialObj=SerialObj))
                 rootNode.addObject(Controller(name="ActuationController", RootNode=rootNode))
+                
+                
                 
                 return rootNode
