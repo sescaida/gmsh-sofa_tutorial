@@ -204,7 +204,7 @@ def generateGeometry(Step):
         
     gmsh.model.occ.synchronize()
 
-Step=4
+Step=7
 print("Showing Step: " + str(Step))
 generateGeometry(Step)
     
