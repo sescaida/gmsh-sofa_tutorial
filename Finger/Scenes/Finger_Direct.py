@@ -153,10 +153,18 @@ def createScene(rootNode):
 
                 model.addObject('LinearSolverConstraintCorrection', name='GCS', solverName='precond')
                 
-                FollowingMONode = model.addChild('FollowingMONode')                
-                FollowingMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=20, showColor=[0,0,1]) # orientation is 240 deg away from scene origin
-                #FollowingMONode.addObject('RestShapeSpringsForceField', name='fixed1', points=[0], external_rest_shape="@../../ReferenceMONode/ReferenceMO", stiffness=1e12)
-                FollowingMONode.addObject("BarycentricMapping")
+#                print("CablePoints: {}".format(CablePoints))
+#                RigidPose = np.append(CablePoints[-3:],[0,0,0,1])
+#                print("RigidPose: {}".format(RigidPose))
+                RigidChild = model.addChild("RigidChild")
+                RigidChild.addObject("MechanicalObject", template="Rigid3d", position=[[0,15.33,-110.66,0,0,0,1]], showObject=True, showObjectScale=5)
+                #RigidChild.addObject("MechanicalObject", template="Rigid3d", position=[RigidPose.tolist()], showObject=True, showObjectScale=5)
+                RigidChild.addObject("BarycentricMapping", template="Vec3d,Rigid3d")
+                
+#                FollowingMONode = model.addChild('FollowingMONode')                
+#                FollowingMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=20, showColor=[0,0,1]) # orientation is 240 deg away from scene origin
+#                #FollowingMONode.addObject('RestShapeSpringsForceField', name='fixed1', points=[0], external_rest_shape="@../../ReferenceMONode/ReferenceMO", stiffness=1e12)
+#                FollowingMONode.addObject("BarycentricMapping")
 
                 ##########################################
                 # Effector                               #
@@ -202,7 +210,10 @@ def createScene(rootNode):
                 cable1.addObject('MechanicalObject', position=CablePoints.tolist())
                 
                 cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=10)                               
-                cable1.addObject('BarycentricMapping')                
+                cable1.addObject('BarycentricMapping')   
+                
+                
+                
                                                 
                 ##########################################
                 # Moving Point                           #

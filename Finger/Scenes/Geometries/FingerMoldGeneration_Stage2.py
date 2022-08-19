@@ -69,18 +69,38 @@ def createMoldLidStage2():
     #-----------------
     
 def createHoleLidForMoldStage2():
-    Tolerance = 0.1
-    MoldHole1DimTag = (3,gmsh.model.occ.addBox(-(Const.MoldHoleThickness/2+Tolerance),0,Const.MoldHoleLength/2+Tolerance,Const.MoldHoleThickness+2*Tolerance,2*Const.MoldWallThickness,-(Const.MoldHoleLength+2*Tolerance)))   
+    Tolerance = 0.125
+    MoldHole1DimTag = (3,gmsh.model.occ.addBox(-(Const.MoldHoleThickness/2-Tolerance),0,Const.MoldHoleLength/2-Tolerance,Const.MoldHoleThickness-2*Tolerance,2*Const.MoldWallThickness,-(Const.MoldHoleLength-2*Tolerance)))   
     MoldHoleLidDimTag = (3,gmsh.model.occ.addBox(-(Const.MoldHoleThickness/2+Const.MoldHoleLidBorderThickness),
                                                  0,
                                                  Const.MoldHoleLength/2+Const.MoldHoleLidBorderThickness,
                                                  Const.MoldHoleThickness+2*Const.MoldHoleLidBorderThickness,
                                                  2*Const.MoldWallThickness/2,
                                                  -(Const.MoldHoleLength+2*Const.MoldHoleLidBorderThickness)))
+    
+    HoleCylinderDimTag = (3, gmsh.model.occ.addCylinder(0,-10,0, 0,20,0, 0.5))
+    
+    Marker1DimTag = (3, gmsh.model.occ.addCylinder(0,-2*Const.MoldWallThickness,0, 0,-Const.MarkerDepth,0,Const.MarkerRadius))
+    Marker2DimTag = (3, gmsh.model.occ.addCylinder(0,-2*Const.MoldWallThickness,0, 0,-Const.MarkerDepth,0,Const.MarkerRadius))
+    Marker3DimTag = (3, gmsh.model.occ.addCylinder(0,-2*Const.MoldWallThickness,0, 0,-Const.MarkerDepth,0,Const.MarkerRadius))
+    gmsh.model.occ.translate([Marker1DimTag],0,0,-Const.MarkerVerticalSpacing/2)
+    gmsh.model.occ.translate([Marker2DimTag], Const.MarkerHorizontalSpacing/2,0, Const.MarkerVerticalSpacing/2)
+    gmsh.model.occ.translate([Marker3DimTag],-Const.MarkerHorizontalSpacing/2,0, Const.MarkerVerticalSpacing/2)
+    
+    
     gmsh.model.occ.translate([MoldHole1DimTag],0,Const.Height,-1.5*Const.Length)
-    gmsh.model.occ.translate([MoldHoleLidDimTag],0,Const.Height+2*Const.MoldWallThickness,-1.5*Const.Length)
-    FuseOut = gmsh.model.occ.fuse([MoldHole1DimTag],[MoldHoleLidDimTag])
+    gmsh.model.occ.translate([MoldHoleLidDimTag, HoleCylinderDimTag, Marker1DimTag, Marker2DimTag, Marker3DimTag],0,Const.Height+2*Const.MoldWallThickness,-1.5*Const.Length)
+#    gmsh.model.occ.translate([],0,Const.Height+2*Const.MoldWallThickness,-1.5*Const.Length)
+    
+    
+    FuseOut = gmsh.model.occ.fuse([MoldHole1DimTag],[MoldHoleLidDimTag,Marker1DimTag, Marker2DimTag, Marker3DimTag])
+    
+    LidDimTag = FuseOut[0][0]
+    
+    CutOut = gmsh.model.occ.cut([LidDimTag],[HoleCylinderDimTag])
+    
     gmsh.model.occ.synchronize()
+    gmsh.fltk.run()
     gmsh.write("HoleLidForMoldStage2.step")
     gmsh.model.mesh.generate(2)
     gmsh.model.mesh.refine()
@@ -181,6 +201,7 @@ def createFingerClamp():
     gmsh.write("FingerClamp.step")
     gmsh.model.mesh.generate(2)
     gmsh.model.mesh.refine()
+    gmsh.model.mesh.refine()
     gmsh.write("FingerClamp.stl")
     
 #
@@ -188,10 +209,10 @@ def createFingerClamp():
 #gmsh.clear()
 #createMoldLidStage2()
 #gmsh.clear()
-#createHoleLidForMoldStage2()
+createHoleLidForMoldStage2()
 #gmsh.clear()
 #creakteMoldForCork()
 #gmsh.clear()
-createFingerClamp()
+#createFingerClamp()
 gmsh.model.occ.synchronize()
 gmsh.fltk.run()

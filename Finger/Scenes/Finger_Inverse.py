@@ -57,7 +57,7 @@ class Controller(Sofa.Core.Controller):
         self.DesiredVolumeIncrement = 300
         self.SideInflationSign = 1
         self.LivePressureDataPath = "PressureData.txt"
-        self.LiveMuCaDataPath = "MuCaData.txt"
+        self.LiveMuCaDataPath = "Matrix.txt"
         self.Data = np.array([])
         self.LastData = self.Data
         NSensors = 5
@@ -128,31 +128,28 @@ class Controller(Sofa.Core.Controller):
         if len(self.MuCaData) == 0:
             print("empty!")
             return
+
+        Idxs = []        
         
-        Idxs = []
-        MeanSect1 = np.mean(self.MuCaData[0,1:])
-        print("Mean Sect1: {}".format(MeanSect1))
-        DetectionThreshold1 = 100
-        DetectionThreshold2 = 60
+        DetectionThreshold1 = 70
+        DetectionThreshold2 = 10
         DetectionThreshold3 = 100
-        if ((self.MuCaData[0,1]-MeanSect1)> DetectionThreshold1):
-            Idxs = Idxs +  [0]
-        elif ((self.MuCaData[0,2]-MeanSect1)> DetectionThreshold2):
-            Idxs = Idxs +  [1]
-        elif ((self.MuCaData[0,3]-MeanSect1)> DetectionThreshold3):
-            Idxs = Idxs +  [2]
-            
-        MeanSect2 = np.mean(self.MuCaData[1,1:])
-        print("Mean Sect2: {}".format(MeanSect2))
-        DetectionThreshold3 = 100
-        DetectionThreshold4 = 70
-        DetectionThreshold5 = 100
-        if ((self.MuCaData[1,1]-MeanSect1)> DetectionThreshold3):
+        if self.MuCaData[0,1] > DetectionThreshold1:
+            Idxs = Idxs +  [0]        
+        elif self.MuCaData[0,3] > DetectionThreshold3:
+            Idxs = Idxs +  [2]            
+                
+        DetectionThreshold3 = 170
+        DetectionThreshold4 = 1000 # this will never activate it!
+        DetectionThreshold5 = 25
+        if self.MuCaData[1,1] > DetectionThreshold3:
             Idxs = Idxs +  [3]
-#        elif ((self.MuCaData[1,2]-MeanSect1)> DetectionThreshold4):
-#            Idxs = Idxs +  [4]
-#        elif ((self.MuCaData[1,3]-MeanSect1)> DetectionThreshold5):
-#            Idxs = Idxs +  [5]
+        elif self.MuCaData[1,2] > DetectionThreshold4:
+            Idxs = Idxs +  [4]
+        elif self.MuCaData[1,3] > DetectionThreshold5:
+            Idxs = Idxs +  [5]
+        elif self.MuCaData[0,2] > DetectionThreshold2:
+            Idxs = Idxs +  [1]
 #            
 #            
         

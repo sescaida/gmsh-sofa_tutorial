@@ -13,7 +13,7 @@ Length = 40
 Height = 20
 JointHeight = 6
 Thickness = 17.5
-JointSlopeAngle = np.deg2rad(45)
+JointSlopeAngle = np.deg2rad(30)
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
@@ -43,6 +43,12 @@ ThicknessMold = 2*OuterRadius + 2*MoldWallThickness
 LengthMold = 3*Length + 2*MoldWallThickness
 HeightMold = Height + FixationWidth + MoldWallThickness    
 MoldHoleLidBorderThickness = 2
+
+# Markers
+MarkerVerticalSpacing = 16
+MarkerHorizontalSpacing = 11.5
+MarkerRadius = 1.5
+MarkerDepth = 1
 
 #Cable
 CableRadius = 0.75

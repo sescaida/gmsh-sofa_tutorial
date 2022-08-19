@@ -341,13 +341,13 @@ def createFinger(Stage1Mod=False, lc = 7):
     
     defineMeshSizes(lc)
     
-    gmsh.model.occ.synchronize()    
+    gmsh.model.occ.synchronize()        
     gmsh.write("Finger_Parametric.step")
     gmsh.model.mesh.generate(3)
     gmsh.write("Finger_Volumetric.vtk")
-    
+#    
     gmsh.model.mesh.clear()
-    #gmsh.model.mesh.generate(0)
+    gmsh.model.mesh.generate(0)
     gmsh.model.mesh.generate(2)
     gmsh.model.mesh.refine()
     gmsh.write("Finger_Surface.stl")

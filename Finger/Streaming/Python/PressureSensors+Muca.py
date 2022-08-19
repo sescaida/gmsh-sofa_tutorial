@@ -14,7 +14,7 @@ import os
 
 ScenePath = os.path.dirname(os.path.abspath(__file__))+'/../../Scenes/'
 PressureDataPath = ScenePath + 'PressureData.txt'
-MuCaDataPath = ScenePath + 'MuCaData.txt'
+MatrixPath = ScenePath + 'Matrix.txt'
 
 SerialObj = serial.Serial('/dev/ttyACM0',115200,timeout=0.1)
 
@@ -25,7 +25,7 @@ rows = 2
 
 fig = plt.figure()
 fig.suptitle('Capacitive Sensor Data', fontsize=16)
-im = plt.imshow(np.empty((rows,cols)),cmap='gray', vmin=0, vmax=700, animated=True)
+im = plt.imshow(np.empty((rows,cols)),cmap='gray', vmin=0, vmax=200, animated=True)
 Back = np.zeros((rows,cols))
 Matrix = np.zeros((rows,cols))
 Iteration = 0
@@ -47,8 +47,21 @@ def updatefig(*args):
             Matrix = np.reshape(FloatsMuCa,(rows,cols)) - Back        
             if Iteration == WaitFrames:
                 Back = Matrix            
+            
+            
+            # remapping to account for                     
+            Matrix = np.array([[Matrix[0,0], Matrix[0,2],Matrix[0,1],Matrix[0,3]],[Matrix[1,0], Matrix[1,3],Matrix[1,2],Matrix[1,1]]])
+            print("Raw Matrix")
             print(Matrix)        
-            np.savetxt(MuCaDataPath,Matrix)
+            MeanSect1 = np.mean(Matrix[0,1:])
+            MeanSect2 = np.mean(Matrix[1,1:])
+            
+            Matrix[0,1:] = Matrix[0,1:]-MeanSect1
+            Matrix[1,1:] = Matrix[1,1:]-MeanSect2
+            print("Normalized Matrix")
+            print(Matrix)        
+            
+            np.savetxt(MatrixPath,Matrix)
             im.set_array(Matrix)        
         
         
