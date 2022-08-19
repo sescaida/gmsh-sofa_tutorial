@@ -63,7 +63,7 @@ class Controller(Sofa.Core.Controller):
         NSensors = 5
         self.Contacts = np.zeros(NSensors,int)
         self.ContactIdxs = np.array([0,1,2,3,4,5])
-        self.ContactDirections = np.array([[1,0,0],[0,-1,0], [-1,0,0],[1,0,0],[0,-1,0],[-1,0,0]])
+        self.ContactDirections = np.array([[-1,0,0],[0,-1,0], [1,0,0],[-1,0,0],[0,-1,0],[1,0,0]])
         
         
         print('Finished Init')
@@ -132,7 +132,7 @@ class Controller(Sofa.Core.Controller):
         Idxs = []        
         
         DetectionThreshold1 = 70
-        DetectionThreshold2 = 10
+        DetectionThreshold2 = 150
         DetectionThreshold3 = 100
         if self.MuCaData[0,1] > DetectionThreshold1:
             Idxs = Idxs +  [0]        
@@ -234,8 +234,8 @@ def createScene(rootNode):
                    
                 
                 model = rootNode.addChild('model')
-#                model.addObject('EulerImplicit', name='odesolver',rayleighStiffness=0.1)
-                model.addObject('EulerImplicit', name='odesolver',rayleighStiffness=0.1)
+                model.addObject('EulerImplicit', name='odesolver')#,rayleighStiffness=0.01)
+                #model.addObject('EulerImplicit', name='odesolver',rayleighStiffness=0.1)
                 #model.addObject('PCGLinearSolver', name='linearSolver',iterations='25', tolerance='1.0e-9', preconditioners="precond")
                 #model.addObject('SparseLDLSolver', name='precond')
                 model.addObject('EigenSimplicialLDLT', name='precond', template="CompressedRowSparseMatrixMat3x3d")
