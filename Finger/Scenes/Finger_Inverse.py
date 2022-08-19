@@ -326,7 +326,31 @@ def createScene(rootNode):
                 FPA1 = PushingActuationNode.addObject('ForcePointActuator', name="FPA1", direction=[1,0,0], indices = [0], showForce=True,visuScale=0.2, template='Vec3d', printLog=True)                               
                 FPA2 = PushingActuationNode.addObject('ForcePointActuator', name="FPA2", direction=[1,0,0], indices = [], showForce=True,visuScale=0.2, template='Vec3d', printLog=True)                               
                 PushingActuationNode.addObject('BarycentricMapping')        
-                                                
+                
+                                     
+#                ##########################################
+#                # Representatio of Trackable             #
+#                ##########################################
+
+                Marker1Coords = np.array([[Const.MarkerHorizontalSpacing/2, Const.Height, -(2.5*Const.Length - Const.MarkerVerticalSpacing/2)]])
+                Marker2Coords = np.array([[-Const.MarkerHorizontalSpacing/2, Const.Height, -(2.5*Const.Length - Const.MarkerVerticalSpacing/2)]])
+                Marker3Coords = np.array([[0, Const.Height, -(2.5*Const.Length + Const.MarkerVerticalSpacing/2)]])
+                
+                MarkersArray = np.concatenate((Marker1Coords, Marker2Coords,Marker3Coords), axis=0)
+                print("MarkersArray: {}".format(MarkersArray))
+                MarkerBarycenter = np.mean(MarkersArray,axis=0)
+                print("MarkerBarycenter: {}".format(MarkerBarycenter))
+                MarkerPose = np.append(MarkerBarycenter, [0,0,0,1])
+                print("MarkerPose: {}".format(MarkerPose))
+                
+                MarkerRepresentationNode = model.addChild("MarkerRepresentation")
+                MarkerRepresentationNode.addObject("MechanicalObject", template="Vec3d", position=MarkersArray.tolist(), showObject=True, showObjectScale=5)
+                MarkerRepresentationNode.addObject("BarycentricMapping")
+                
+                TrackableRepresentationNode = model.addChild("TrackableRepresentation")               
+                TrackableRepresentationNode.addObject("MechanicalObject", template="Rigid3d", position=[MarkerPose.tolist()], showObject=True, showObjectScale=5)
+                TrackableRepresentationNode.addObject("BarycentricMapping")
+                              
 #                ##########################################
 #                # Moving Point                           #
 #                ##########################################
