@@ -10,10 +10,12 @@ Created on Fri Aug 19 19:53:45 2022
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
+import numpy as np
 
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.pose)
-    
+    Pose = np.array([data.pose.position.x, data.pose.position.y, data.pose.position.z, data.pose.orientation.x, data.pose.orientation.y, data.pose.orientation.z, data.pose.orientation.w])
+    np.savetxt("../../Scenes/VRPNPose.txt", Pose)
 def listener():
 
     # In ROS, nodes are uniquely named. If two nodes with the same

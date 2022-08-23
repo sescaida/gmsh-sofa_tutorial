@@ -27,10 +27,18 @@ int Deg2Bin(int Deg)
 {
   float ConversionFactor = 0.325;
   int ZeroOffset = 512;
-  int Bin = ZeroOffset + int(Deg/ConversionFactor);
+  int Bin = ZeroOffset + round(Deg/ConversionFactor);
   return Bin;
 }
 
+float Bin2Deg(int Bin)
+{
+  float Deg = 0;
+  float ZeroOffset = 512;
+  float ConversionFactor = 0.325;
+  Deg = (Bin-ZeroOffset) * ConversionFactor; 
+  return Deg;
+}
 void loop() {
   herkulex_bus.update();
 
@@ -41,18 +49,22 @@ void loop() {
   {
      DesiredAngle = Serial.parseInt();
      int BinAngle = Deg2Bin(DesiredAngle);
-     Serial.print("Going to the following Angle (deg, bin): ");
-     Serial.print(DesiredAngle);
-     Serial.print(", ");
-     Serial.println(BinAngle);
+//     Serial.print("Going to the following Angle (deg, bin): ");
+//     Serial.print(DesiredAngle);
+//     Serial.print(", ");
+//     Serial.println(BinAngle);
      my_servo.setPosition(BinAngle, 50, HerkulexLed::Green);
      while(Serial.available())
      {
       Serial.read();
-      Serial.println("Debug");
+//      Serial.println("Debug");
      }
   }
-
+  
+  uint16_t CurrentPosition = my_servo.getPosition();
+//  Serial.println(CurrentPosition);
+  Serial.println(Bin2Deg(CurrentPosition));
+  
 //  if ( (now - last_update) > 1000) {
 //    // called every 1000 ms
 //    if (toggle) {

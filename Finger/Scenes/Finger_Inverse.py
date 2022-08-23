@@ -4,7 +4,7 @@ import SofaRuntime
 import os
 import sys
 import numpy as np
-
+from scipy.spatial.transform import Rotation as R
 
 import os
 
@@ -29,6 +29,11 @@ class Controller(Sofa.Core.Controller):
         print(" Python::__init__::" + str(self.name.value))
         
         self.RootNode = kwargs['RootNode']
+        self.OptiTrackFrameMO = kwargs['OptiTrackFrameMO']
+        self.TrackableFrameMO = kwargs['TrackableFrameMO']
+        self.MarkersOTMO = kwargs['MarkersOTMO']
+        self.MarkersOTBase = kwargs['MarkersOTBase']
+        self.TrackableRepresentationMO = kwargs['TrackableRepresentationMO']
         print(kwargs['RootNode'])
         
         self.Counter = 0
@@ -37,7 +42,7 @@ class Controller(Sofa.Core.Controller):
         self.begun = False
         
         self.ModelNode = self.RootNode.model        
-        self.CableActuator = self.ModelNode.CableNode.CableActuator
+        self.CableEquality = self.ModelNode.CableNode.CableEquality
         self.FPA1 = self.ModelNode.PushingActuationNode.FPA1
         self.FPA2 = self.ModelNode.PushingActuationNode.FPA2
         #self.ReferenceMO = self.RootNode.ReferenceMONode.ReferenceMO
@@ -58,12 +63,20 @@ class Controller(Sofa.Core.Controller):
         self.SideInflationSign = 1
         self.LivePressureDataPath = "PressureData.txt"
         self.LiveMuCaDataPath = "Matrix.txt"
+        self.VRPNPose = [0,0,0,0,0,0,1]
+        self.LiveVRPNPosePath = "VRPNPose.txt"
+        self.LiveMotorPosition = "MotorPosition.txt"
+        self.MotorPosition = 0 # in deg
         self.Data = np.array([])
         self.LastData = self.Data
         NSensors = 5
         self.Contacts = np.zeros(NSensors,int)
         self.ContactIdxs = np.array([0,1,2,3,4,5])
         self.ContactDirections = np.array([[-1,0,0],[0,-1,0], [1,0,0],[-1,0,0],[0,-1,0],[1,0,0]])
+        
+        
+        #---- eval stuff ---
+        self.PoseLog = np.empty((0,14))
         
         
         print('Finished Init')
@@ -80,12 +93,50 @@ class Controller(Sofa.Core.Controller):
             self.Data = np.loadtxt(self.LivePressureDataPath)
             self.RealPressures = self.Data[:4] # in kPa            
             self.MuCaData = np.loadtxt(self.LiveMuCaDataPath)
+            self.VRPNPose = np.loadtxt(self.LiveVRPNPosePath)
             
         except Exception as e:
             print("Warning: couldn't read pressures or contact mask from file")
 #            self.Data = self.LastData
 #            self.RealPressures = self.Data[:6] # in kPa   
             return
+        
+        #-----------
+        # Feed cable equality
+        #-----------
+        
+#        self.CableEquality.
+        #-----------
+        # Pose stuff
+        #-----------
+        print("VRPNPose: {}".format(self.VRPNPose))
+        OptiTrackFrame = self.OptiTrackFrameMO.position
+        
+        OptiTrackPosition = OptiTrackFrame[0][:3]
+        OptiTrackOrientation = R.from_quat(OptiTrackFrame[0][3:])
+        
+        VRPNPosition = self.VRPNPose[:3] * 1000 # was in meters!
+        VRPNOrientation = R.from_quat(self.VRPNPose[3:])
+        
+        print("VRPNOrientation: {}".format(VRPNOrientation.as_quat()))
+        print("VRPNPosition: {}".format(VRPNPosition))
+        #TrackableOrientation = OptiTrackOrientation.inv()*VRPNOrientation*OptiTrackOrientation
+        TrackableOrientation = OptiTrackOrientation*VRPNOrientation*OptiTrackOrientation.inv()
+        TrackablePosition = OptiTrackOrientation.apply(VRPNPosition) + OptiTrackPosition
+        print("TrackableOrientation: {}".format(TrackableOrientation.as_quat()))
+        print("TrackablePosition: {}".format(TrackablePosition))
+        TrackablePose = np.concatenate((TrackablePosition, TrackableOrientation.as_quat()))
+        self.TrackableFrameMO.position.value = [TrackablePose.tolist()]
+        
+        
+        MarkersOTBase = self.MarkersOTBase
+        MarkersBarycenterInOT = np.mean(MarkersOTBase,0)
+        print("MarkersOTBase: {}".format(MarkersOTBase))
+        print("MarkersBarycenterInOT: {}".format(MarkersBarycenterInOT))
+        T1 = VRPNOrientation.apply(MarkersOTBase-MarkersBarycenterInOT)+VRPNPosition
+        TransformedMarkersOT = OptiTrackOrientation.apply(T1) + OptiTrackPosition
+        print("TransformedMarkersOT: {}".format(TransformedMarkersOT))
+        self.MarkersOTMO.position.value = TransformedMarkersOT.tolist()
         
         
         print('Pressures: ' +  str(self.RealPressures))
@@ -99,7 +150,7 @@ class Controller(Sofa.Core.Controller):
         self.InitialVolumeCavity4 = self.VolumeEffector4.initialCavityVolume.value
         
         FactorU = 10
-        Factor = 5
+        Factor = 2.5
         #Factor = 17
         AtmPressure = 101 #kPa
         # P*V is constant, Ci are theses constants as found by the initial volume. A factor is introduced to account for tubing and volume inside the pressure sensor        
@@ -139,7 +190,7 @@ class Controller(Sofa.Core.Controller):
         elif self.MuCaData[0,3] > DetectionThreshold3:
             Idxs = Idxs +  [2]            
                 
-        DetectionThreshold3 = 170
+        DetectionThreshold3 = 120
         DetectionThreshold4 = 1000 # this will never activate it!
         DetectionThreshold5 = 25
         if self.MuCaData[1,1] > DetectionThreshold3:
@@ -210,13 +261,21 @@ class Controller(Sofa.Core.Controller):
     def onKeypressedEvent(self, c):
         key = c['key']        
                         
+        if key=='l' or key=='L':
+            print("Logging pose!")
+            CurrentPoses = np.concatenate((self.TrackableFrameMO.position.value[0], self.TrackableRepresentationMO.position.value[0]))
+            print("CurrentPoses: {}".format(CurrentPoses))
+            self.PoseLog = np.concatenate((self.PoseLog,[CurrentPoses]),0)
+        if key=='f' or key=='F':
+            print("finishing log")
+            np.savetxt("OutputData/PoseLog.txt",self.PoseLog)
 
 def createScene(rootNode):
     
                 rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots SoftRobots.Inverse EigenLinearSolvers')
                 rootNode.addObject('VisualStyle', displayFlags='hideWireframe showBehaviorModels hideCollisionModels hideBoundingCollisionModels showForceFields showInteractionForceFields')
 
-                rootNode.findData('gravity').value = [0, 0, -9810] #
+                rootNode.findData('gravity').value = [0, 0, 0] #
                 rootNode.findData('dt').value = 0.02
 
                 rootNode.addObject('FreeMotionAnimationLoop')
@@ -243,7 +302,7 @@ def createScene(rootNode):
                 model.addObject('MeshVTKLoader', name='loader', filename=VolumetricMeshPath, scale3d=[1, 1, 1])
                 model.addObject('TetrahedronSetTopologyContainer', src='@loader', name='container')
                 model.addObject('TetrahedronSetGeometryAlgorithms')
-                model.addObject('MechanicalObject', name='tetras', template='Vec3d', showIndices='false', showIndicesScale='4e-5')
+                model.addObject('MechanicalObject', name='tetras', template='Vec3d', showIndices='false', showIndicesScale='10')
                 model.addObject('UniformMass', totalMass='0.1')
                 model.addObject('TetrahedronFEMForceField', template='Vec3d', name='FEM', method='large', poissonRatio=Const.PoissonRation,  youngModulus=Const.YoungsModulus)
 
@@ -290,7 +349,7 @@ def createScene(rootNode):
                 
                 
                 NSegments = 3
-                CableHeight = 2*(Const.Height-Const.JointHeight)/3
+                CableHeight = 8*(Const.Height-Const.JointHeight)/10
                 LengthDiagonal = CableHeight/np.cos(Const.JointSlopeAngle)
                 JointStandoff = LengthDiagonal*np.sin(Const.JointSlopeAngle)
                 JointStandoffExtra = 2
@@ -303,7 +362,8 @@ def createScene(rootNode):
                 
                 CableNode.addObject('MechanicalObject', position=CablePoints.tolist())
                 
-                CableNode.addObject('CableActuator', template='Vec3d', name='CableActuator', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True)                               
+#                CableNode.addObject('CableActuator', template='Vec3d', name='CableActuator', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True)                               
+                CableNode.addObject('CableEquality', template='Vec3d', name='CableEquality', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, eqDisp=0)                                               
                 CableNode.addObject('BarycentricMapping')             
                 
                 ##########################################
@@ -329,7 +389,7 @@ def createScene(rootNode):
                 
                                      
 #                ##########################################
-#                # Representatio of Trackable             #
+#                # Representatio of Trackable as seen from sim            #
 #                ##########################################
 
                 Marker1Coords = np.array([[Const.MarkerHorizontalSpacing/2, Const.Height, -(2.5*Const.Length - Const.MarkerVerticalSpacing/2)]])
@@ -344,16 +404,61 @@ def createScene(rootNode):
                 print("MarkerPose: {}".format(MarkerPose))
                 
                 MarkerRepresentationNode = model.addChild("MarkerRepresentation")
-                MarkerRepresentationNode.addObject("MechanicalObject", template="Vec3d", position=MarkersArray.tolist(), showObject=True, showObjectScale=5)
+                MarkerRepresentationNode.addObject("MechanicalObject", template="Vec3d", position=MarkersArray.tolist(), showObject=True, showObjectScale=10)
                 MarkerRepresentationNode.addObject("BarycentricMapping")
                 
                 TrackableRepresentationNode = model.addChild("TrackableRepresentation")               
-                TrackableRepresentationNode.addObject("MechanicalObject", template="Rigid3d", position=[MarkerPose.tolist()], showObject=True, showObjectScale=5)
+                TrackableRepresentationMO = TrackableRepresentationNode.addObject("MechanicalObject", template="Rigid3d", position=[MarkerPose.tolist()], showObject=True, showObjectScale=5)
                 TrackableRepresentationNode.addObject("BarycentricMapping")
-                              
+                
+                 ##########################################
+#                # Representatio of Trackable             #
 #                ##########################################
+
+                ##########################################
+                # OptiTrack Trackable                    #
+                ##########################################
+
+                Angle = np.arctan2(Const.MarkerHorizontalSpacing/2,Const.MarkerVerticalSpacing) 
+                
+                QuatOptiTrackFrame = R.from_euler('XYZ',[0,-Angle,0])
+                OptiTrackQuat = QuatOptiTrackFrame.as_quat()
+                OptiTrackFramePose = np.concatenate((Marker2Coords[0],OptiTrackQuat))
+                OptiTrackFrameNode = rootNode.addChild("OptiTrackFrame")
+                OptiTrackFrameMO = OptiTrackFrameNode.addObject("MechanicalObject", template="Rigid3d", position=[OptiTrackFramePose.tolist()], showObject=True, showObjectScale=3)
+                
+                
+                
+                MarkerBarycenterInOT = QuatOptiTrackFrame.inv().apply(MarkerBarycenter-Marker2Coords)
+                print("MarkerBarycenterInOT : {}".format(MarkerBarycenterInOT))
+#               
+                MarkerPosition = QuatOptiTrackFrame.apply(MarkerBarycenterInOT)+Marker2Coords
+                print("MarkerPosition: {}".format(MarkerPosition))
+                TrackableFramePose = np.concatenate((MarkerPosition[0],[0,0,0,1]))                
+                TrackableFrameNode = rootNode.addChild("TrackableFrame")
+                TrackableFrameMO = TrackableFrameNode.addObject("MechanicalObject", template="Rigid3d", position=[TrackableFramePose.tolist()], showObject=True, showObjectScale=3)
+                
+                TriangleSideLength = Const.MarkerVerticalSpacing/np.cos(Angle)
+                
+                
+                Marker1OT = np.array([TriangleSideLength*np.sin(2*Angle), 0, -(TriangleSideLength-TriangleSideLength*np.cos(2*Angle))])                  
+                Marker2OT = np.array([0,0,0])
+                Marker3OT = np.array([0,0,-TriangleSideLength])
+                
+                MarkersOT = np.concatenate(([Marker1OT], [Marker2OT], [Marker3OT]),0)
+                MarkersOTBase = MarkersOT
+                MarkersOTTransformed = QuatOptiTrackFrame.apply(MarkersOT) + Marker2Coords
+                
+                MarkersOTNode = rootNode.addChild("MarkersOT")
+                MarkersOTMO = MarkersOTNode.addObject("MechanicalObject", template="Vec3d", position=MarkersOTTransformed.tolist(), showObject=True, showObjectScale=10, showColor=[0,1,0])
+#                MarkersOTNode.addObject("BarycentricMapping")
+            
+#                Awa = QuatOptiTrackFrame.inv().apply(MarkerBarycenter-Marker2Coords)
+                 ##########################################
 #                # Moving Point                           #
 #                ##########################################
+                
+                
 #                ReferenceMONode = rootNode.addChild('ReferenceMONode')
 #                
 #                ReferenceMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=10) # orientation is 240 deg away from scene origin
@@ -361,6 +466,6 @@ def createScene(rootNode):
                 ##########################################
                 # Controller                             #
                 ##########################################
-                rootNode.addObject(Controller(name="ActuationController", RootNode=rootNode))
+                rootNode.addObject(Controller(name="ActuationController", RootNode=rootNode, OptiTrackFrameMO=OptiTrackFrameMO, TrackableFrameMO=TrackableFrameMO, MarkersOTMO=MarkersOTMO, MarkersOTBase=MarkersOTBase, TrackableRepresentationMO=TrackableRepresentationMO))
                 
                 return rootNode

@@ -40,6 +40,7 @@ def updatefig(*args):
         SplitStr = Decoded.split(',')
         Floats = np.array([float(i) for i in SplitStr])        
         Pressures = Floats[:4]
+        print("Pressures: {}".format(Pressures))
         np.savetxt(PressureDataPath,Pressures)
         
         if (len(Floats)>4):
