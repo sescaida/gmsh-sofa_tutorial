@@ -40,6 +40,9 @@ def updatefig(*args):
         SplitStr = Decoded.split(',')
         Floats = np.array([float(i) for i in SplitStr])        
         Pressures = Floats[:4]
+        # Calibration on foot!
+#        Pressures[0] = Pressures[0] * 1.01
+#        Pressures[3] = Pressures[3] / 1.16
         print("Pressures: {}".format(Pressures))
         np.savetxt(PressureDataPath,Pressures)
         

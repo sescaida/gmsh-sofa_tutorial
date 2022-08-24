@@ -182,7 +182,7 @@ class Controller(Sofa.Core.Controller):
 
         Idxs = []        
         
-        DetectionThreshold1 = 70
+        DetectionThreshold1 = 55
         DetectionThreshold2 = 150
         DetectionThreshold3 = 100
         if self.MuCaData[0,1] > DetectionThreshold1:
@@ -190,9 +190,9 @@ class Controller(Sofa.Core.Controller):
         elif self.MuCaData[0,3] > DetectionThreshold3:
             Idxs = Idxs +  [2]            
                 
-        DetectionThreshold3 = 120
+        DetectionThreshold3 = 100
         DetectionThreshold4 = 1000 # this will never activate it!
-        DetectionThreshold5 = 25
+        DetectionThreshold5 = 40
         if self.MuCaData[1,1] > DetectionThreshold3:
             Idxs = Idxs +  [3]
         elif self.MuCaData[1,2] > DetectionThreshold4:
@@ -362,8 +362,8 @@ def createScene(rootNode):
                 
                 CableNode.addObject('MechanicalObject', position=CablePoints.tolist())
                 
-#                CableNode.addObject('CableActuator', template='Vec3d', name='CableActuator', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True)                               
-                CableNode.addObject('CableEquality', template='Vec3d', name='CableEquality', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, eqDisp=0)                                               
+                CableNode.addObject('CableActuator', template='Vec3d', name='CableEquality', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True)                               
+#                CableNode.addObject('CableEquality', template='Vec3d', name='CableEquality', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, eqDisp=0)                                               
                 CableNode.addObject('BarycentricMapping')             
                 
                 ##########################################
@@ -404,11 +404,11 @@ def createScene(rootNode):
                 print("MarkerPose: {}".format(MarkerPose))
                 
                 MarkerRepresentationNode = model.addChild("MarkerRepresentation")
-                MarkerRepresentationNode.addObject("MechanicalObject", template="Vec3d", position=MarkersArray.tolist(), showObject=True, showObjectScale=10)
+                MarkerRepresentationNode.addObject("MechanicalObject", template="Vec3d", position=MarkersArray.tolist(), showObject=False, showObjectScale=10)
                 MarkerRepresentationNode.addObject("BarycentricMapping")
                 
                 TrackableRepresentationNode = model.addChild("TrackableRepresentation")               
-                TrackableRepresentationMO = TrackableRepresentationNode.addObject("MechanicalObject", template="Rigid3d", position=[MarkerPose.tolist()], showObject=True, showObjectScale=5)
+                TrackableRepresentationMO = TrackableRepresentationNode.addObject("MechanicalObject", template="Rigid3d", position=[MarkerPose.tolist()], showObject=False, showObjectScale=5)
                 TrackableRepresentationNode.addObject("BarycentricMapping")
                 
                  ##########################################
@@ -425,7 +425,7 @@ def createScene(rootNode):
                 OptiTrackQuat = QuatOptiTrackFrame.as_quat()
                 OptiTrackFramePose = np.concatenate((Marker2Coords[0],OptiTrackQuat))
                 OptiTrackFrameNode = rootNode.addChild("OptiTrackFrame")
-                OptiTrackFrameMO = OptiTrackFrameNode.addObject("MechanicalObject", template="Rigid3d", position=[OptiTrackFramePose.tolist()], showObject=True, showObjectScale=3)
+                OptiTrackFrameMO = OptiTrackFrameNode.addObject("MechanicalObject", template="Rigid3d", position=[OptiTrackFramePose.tolist()], showObject=False, showObjectScale=3)
                 
                 
                 
@@ -436,7 +436,7 @@ def createScene(rootNode):
                 print("MarkerPosition: {}".format(MarkerPosition))
                 TrackableFramePose = np.concatenate((MarkerPosition[0],[0,0,0,1]))                
                 TrackableFrameNode = rootNode.addChild("TrackableFrame")
-                TrackableFrameMO = TrackableFrameNode.addObject("MechanicalObject", template="Rigid3d", position=[TrackableFramePose.tolist()], showObject=True, showObjectScale=3)
+                TrackableFrameMO = TrackableFrameNode.addObject("MechanicalObject", template="Rigid3d", position=[TrackableFramePose.tolist()], showObject=False, showObjectScale=3)
                 
                 TriangleSideLength = Const.MarkerVerticalSpacing/np.cos(Angle)
                 
@@ -450,7 +450,7 @@ def createScene(rootNode):
                 MarkersOTTransformed = QuatOptiTrackFrame.apply(MarkersOT) + Marker2Coords
                 
                 MarkersOTNode = rootNode.addChild("MarkersOT")
-                MarkersOTMO = MarkersOTNode.addObject("MechanicalObject", template="Vec3d", position=MarkersOTTransformed.tolist(), showObject=True, showObjectScale=10, showColor=[0,1,0])
+                MarkersOTMO = MarkersOTNode.addObject("MechanicalObject", template="Vec3d", position=MarkersOTTransformed.tolist(), showObject=False, showObjectScale=10, showColor=[0,1,0])
 #                MarkersOTNode.addObject("BarycentricMapping")
             
 #                Awa = QuatOptiTrackFrame.inv().apply(MarkerBarycenter-Marker2Coords)
