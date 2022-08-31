@@ -25,7 +25,7 @@ rows = 2
 
 fig = plt.figure()
 fig.suptitle('Capacitive Sensor Data', fontsize=16)
-im = plt.imshow(np.empty((rows,cols)),cmap='gray', vmin=0, vmax=200, animated=True)
+im = plt.imshow(np.empty((rows,cols)),cmap='gray', vmin=0, vmax=1200, animated=True)
 Back = np.zeros((rows,cols))
 Matrix = np.zeros((rows,cols))
 Iteration = 0
@@ -54,14 +54,14 @@ def updatefig(*args):
             
             
             # remapping to account for                     
-            Matrix = np.array([[Matrix[0,0], Matrix[0,2],Matrix[0,1],Matrix[0,3]],[Matrix[1,0], Matrix[1,3],Matrix[1,2],Matrix[1,1]]])
+            Matrix = -np.array([[Matrix[0,0], Matrix[0,2],Matrix[0,1],Matrix[0,3]],[Matrix[1,0], Matrix[1,3],Matrix[1,2],Matrix[1,1]]])
             print("Raw Matrix")
             print(Matrix)        
             MeanSect1 = np.mean(Matrix[0,1:])
             MeanSect2 = np.mean(Matrix[1,1:])
             
-            Matrix[0,1:] = Matrix[0,1:]-MeanSect1
-            Matrix[1,1:] = Matrix[1,1:]-MeanSect2
+#            Matrix[0,1:] = Matrix[0,1:]-MeanSect1
+#            Matrix[1,1:] = Matrix[1,1:]-MeanSect2
             print("Normalized Matrix")
             print(Matrix)        
             

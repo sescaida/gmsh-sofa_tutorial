@@ -123,6 +123,7 @@ def createAccordion(Radius, NSegments, SegmentHeight, TeethDepth, WallThickness,
     AccordionDimTags = FusionOut[0]
     
     if Step==5:
+        print("FuseOut: {}".format(FusionOut))
         gmsh.model.occ.synchronize()
         gmsh.fltk.run()
         
@@ -204,6 +205,6 @@ def generateGeometry(Step):
         
     gmsh.model.occ.synchronize()
 
-Step=1
+Step=5
 print("Showing Step: " + str(Step))
 generateGeometry(Step)    

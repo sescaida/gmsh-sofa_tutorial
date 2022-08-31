@@ -10,7 +10,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 
-PoseLog = np.loadtxt("PoseLog.txt")
+PoseLog = np.loadtxt("PoseLogMixed.txt")
 
 OptiTrackPoses = PoseLog[:,:7]
 OptiTrackPositions = OptiTrackPoses[:,:3]
