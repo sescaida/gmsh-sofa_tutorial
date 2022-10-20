@@ -216,7 +216,7 @@ class Controller(Sofa.Core.Controller):
 
 def createScene(rootNode):
     
-                rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots SoftRobots.Inverse EigenLinearSolvers')
+                rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots SoftRobots.Inverse')# EigenLinearSolvers')
                 rootNode.addObject('VisualStyle', displayFlags='hideWireframe showBehaviorModels hideCollisionModels hideBoundingCollisionModels showForceFields showInteractionForceFields')
 
                 rootNode.findData('gravity').value = [0, 0, -9810] #
@@ -240,8 +240,8 @@ def createScene(rootNode):
 #                model.addObject('EulerImplicit', name='odesolver',rayleighStiffness=0.1)
                 model.addObject('EulerImplicit', name='odesolver',rayleighStiffness=0.1)
                 #model.addObject('PCGLinearSolver', name='linearSolver',iterations='25', tolerance='1.0e-9', preconditioners="precond")
-                #model.addObject('SparseLDLSolver', name='precond')
-                model.addObject('EigenSimplicialLDLT', name='precond', template="CompressedRowSparseMatrixMat3x3d")
+                model.addObject('SparseLDLSolver', name='precond')
+                #model.addObject('EigenSimplicialLDLT', name='precond', template="CompressedRowSparseMatrixMat3x3d")
 
                 model.addObject('MeshVTKLoader', name='loader', filename=VolumetricMeshPath, scale3d=[1, 1, 1])
                 model.addObject('TetrahedronSetTopologyContainer', src='@loader', name='container')
