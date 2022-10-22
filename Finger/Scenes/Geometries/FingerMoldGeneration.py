@@ -102,7 +102,8 @@ def createMoldLid(AllCavitiesDimTags):
     #-----------------
     
     CorkBellowHeight = Const.BellowHeight+2
-    CavityCorkSketchDimTag = (2, FingerGeneration.createCavitySketch(Const.OuterRadius, CorkBellowHeight, Const.TeethRadius, Const.WallThickness-1, Const.CenterThickness, Const.PlateauHeight))
+    CorkWallThickness = Const.WallThickness-1
+    CavityCorkSketchDimTag = (2, FingerGeneration.createCavitySketch(Const.OuterRadius, CorkBellowHeight, Const.TeethRadius, CorkWallThickness, Const.CenterThickness, Const.PlateauHeight))
 
 #    
 #    CavityCorkSketchDimTag = (2,FingerGeneration.createCavitySketch(Const.OuterRadius, Const.NBellows, Const.BellowHeight, Const.TeethRadius, Const.WallThickness/2, Const.CenterThickness))
