@@ -91,20 +91,27 @@ def createHoleLidForMoldStage2():
     
 def creakteMoldForCork():
     
-    CavityCorkSketchDimTag = (2,FingerGeneration.createCavitySketch(Const.OuterRadius, Const.NBellowSteps, Const.StepHeight, Const.TeethRadius, Const.WallThickness/2, Const.CenterThickness))    
+    
+    CorkBellowHeight = Const.BellowHeight+2
+    CorkWallThickness = Const.WallThickness-1
+    CavityCorkSketchDimTag = (2, FingerGeneration.createCavitySketch(Const.OuterRadius, CorkBellowHeight, Const.TeethRadius, CorkWallThickness, Const.CenterThickness, Const.PlateauHeight))
+
     Tolerance = 2
-    TotalBellowHeight = Const.NBellowSteps * Const.StepHeight * 2
+    TotalBellowHeight = Const.NBellows * Const.BellowHeight
     CorkMoldHeight = TotalBellowHeight + 2 * Tolerance
     CorkMoldThickness = (Const.OuterRadius+Tolerance) * 2    
     ExtrudeDimTags = gmsh.model.occ.extrude([CavityCorkSketchDimTag],0,Const.CavityCorkThickness,0)    
     HalfDimTag = ExtrudeDimTags[1]
         
-    HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
-    print("HalfCopyDimTag: ", HalfCopyDimTag)
-    gmsh.model.occ.affineTransform(HalfCopyDimTag, [1,0,0,0, 0,1,0,0, 0,0,-1,0])
-     
-    FusionOut = gmsh.model.occ.fuse([HalfDimTag], HalfCopyDimTag)
-    CavityCorkDimTag = FusionOut[0][0]
+#    HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
+#    print("HalfCopyDimTag: ", HalfCopyDimTag)
+#    gmsh.model.occ.affineTransform(HalfCopyDimTag, [1,0,0,0, 0,1,0,0, 0,0,-1,0])
+#     
+#    FusionOut = gmsh.model.occ.fuse([HalfDimTag], HalfCopyDimTag)
+#    CavityCorkDimTag = FusionOut[0][0]
+    CavityCorkDimTag = HalfDimTag
+    gmsh.model.occ.translate([CavityCorkDimTag],0,0,-TotalBellowHeight/2)
+    
     CavityCork2DimTags = gmsh.model.occ.copy([CavityCorkDimTag])
     gmsh.model.occ.affineTransform(CavityCork2DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
     
@@ -116,7 +123,7 @@ def creakteMoldForCork():
                                                    -CorkMoldHeight/2,
                                                    CorkMoldThickness, 
                                                    Const.CavityCorkThickness+Tolerance,
-                                                   CorkMoldHeight))
+                                                   CorkMoldHeight+Tolerance))
     CutOut = gmsh.model.occ.cut([CavityMoldBoxDimTag],[CompleteCorkDimTag])
     gmsh.model.occ.synchronize()
     gmsh.write("MoldForCork.step")
@@ -190,8 +197,8 @@ def createFingerClamp():
 #gmsh.clear()
 #createHoleLidForMoldStage2()
 #gmsh.clear()
-#creakteMoldForCork()
+creakteMoldForCork()
 #gmsh.clear()
-createFingerClamp()
+#createFingerClamp()
 gmsh.model.occ.synchronize()
 gmsh.fltk.run()
