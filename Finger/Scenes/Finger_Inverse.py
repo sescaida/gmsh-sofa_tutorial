@@ -99,7 +99,7 @@ class Controller(Sofa.Core.Controller):
         self.InitialVolumeCavity4 = self.VolumeEffector4.initialCavityVolume.value
         
         FactorU = 10
-        Factor = 5
+        Factor = 3
         #Factor = 17
         AtmPressure = 101 #kPa
         # P*V is constant, Ci are theses constants as found by the initial volume. A factor is introduced to account for tubing and volume inside the pressure sensor        
