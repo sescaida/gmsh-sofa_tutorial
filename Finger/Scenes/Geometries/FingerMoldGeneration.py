@@ -101,30 +101,37 @@ def createMoldLid(AllCavitiesDimTags):
     # Create cavity cork
     #-----------------
     
-    CavityCorkSketchDimTag = (2,FingerGeneration.createCavitySketch(Const.OuterRadius, Const.NBellowSteps, Const.StepHeight, Const.TeethRadius, Const.WallThickness/2, Const.CenterThickness))
-    
+    CorkBellowHeight = Const.BellowHeight+2
+    CavityCorkSketchDimTag = (2, FingerGeneration.createCavitySketch(Const.OuterRadius, CorkBellowHeight, Const.TeethRadius, Const.WallThickness-1, Const.CenterThickness, Const.PlateauHeight))
+
+#    
+#    CavityCorkSketchDimTag = (2,FingerGeneration.createCavitySketch(Const.OuterRadius, Const.NBellows, Const.BellowHeight, Const.TeethRadius, Const.WallThickness/2, Const.CenterThickness))
+  
     ExtrudeDimTags = gmsh.model.occ.extrude([CavityCorkSketchDimTag],0,Const.CavityCorkThickness,0)
     
+
     HalfDimTag = ExtrudeDimTags[1]
-        
-    HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
-    print("HalfCopyDimTag: ", HalfCopyDimTag)
-    gmsh.model.occ.affineTransform(HalfCopyDimTag, [1,0,0,0, 0,1,0,0, 0,0,-1,0])
-     
-    FusionOut = gmsh.model.occ.fuse([HalfDimTag], HalfCopyDimTag)
-    CavityCorkDimTag = FusionOut[0]
     
-    gmsh.model.occ.translate(CavityCorkDimTag,0,0,-Const.Length)
-    CavityCork2DimTags = gmsh.model.occ.copy(CavityCorkDimTag)
-    CavityCork3DimTags = gmsh.model.occ.copy(CavityCorkDimTag)
-    CavityCork4DimTags = gmsh.model.occ.copy(CavityCorkDimTag)    
+#    HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
+#    print("HalfCopyDimTag: ", HalfCopyDimTag)
+#    gmsh.model.occ.affineTransform(HalfCopyDimTag, [1,0,0,0, 0,1,0,0, 0,0,-1,0])
+#     
+#    FusionOut = gmsh.model.occ.fuse([HalfDimTag], HalfCopyDimTag)
+#    CavityCorkDimTags = FusionOut[0]
+#    
+    CavityCorkDimTags = [HalfDimTag]
+    
+    gmsh.model.occ.translate(CavityCorkDimTags,0,0,-Const.Length-CorkBellowHeight/2)
+    CavityCork2DimTags = gmsh.model.occ.copy(CavityCorkDimTags)
+    CavityCork3DimTags = gmsh.model.occ.copy(CavityCorkDimTags)
+    CavityCork4DimTags = gmsh.model.occ.copy(CavityCorkDimTags)    
     
     gmsh.model.occ.affineTransform(CavityCork2DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
     gmsh.model.occ.translate(CavityCork3DimTags,0,0,-Const.Length)
     gmsh.model.occ.affineTransform(CavityCork4DimTags, [-1,0,0,0, 0,1,0,0, 0,0,1,0])
     gmsh.model.occ.translate(CavityCork4DimTags,0,0,-Const.Length)
     gmsh.model.occ.synchronize()
-    AllCavitiesCorkDimTags = CavityCorkDimTag + CavityCork2DimTags + CavityCork3DimTags + CavityCork4DimTags
+    AllCavitiesCorkDimTags = CavityCorkDimTags + CavityCork2DimTags + CavityCork3DimTags + CavityCork4DimTags
     
     FuseOut = gmsh.model.occ.fuse([MoldLidTopDimTag],[MoldLidInteriorDimTag]+AllCavitiesCorkDimTags+AllCavitiesDimTags)
     LidDimTag = FuseOut[0][0]
