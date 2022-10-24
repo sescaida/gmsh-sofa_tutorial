@@ -39,7 +39,6 @@ def createFingerMold(Stage1Mod=False):
                                              Const.ThicknessMold, 
                                              Const.HeightMold, 
                                              -Const.LengthMold))
-    
     CableHeight = 5*Const.Height/6
     CableLength = Const.LengthMold+2*Const.MoldWallThickness
     CableDimTag = (3,gmsh.model.occ.addCylinder(0,CableHeight,2*Const.MoldWallThickness,0,0,-CableLength,Const.CableRadius))
@@ -89,7 +88,20 @@ def createMoldLid(AllCavitiesDimTags):
                                                 Const.ThicknessMold, 
                                                 -Const.MoldWallThickness, 
                                                 -Const.LengthMold))
+    gmsh.model.occ.synchronize()
+
+#    ROITolerance = 0.1 
+    SurfaceBorderDimTags = gmsh.model.getBoundary([MoldLidTopDimTag],oriented=False)    
+    print("SurfaceBorderDimTags : {}".format(SurfaceBorderDimTags))
     
+    LineBorderDimTags = gmsh.model.getBoundary(SurfaceBorderDimTags[0:], combined=False, oriented=False)
+    print("LineBorderDimTags : {}".format(LineBorderDimTags))
+    BorderTagz = Const.dimTagz2Tagz(LineBorderDimTags,1)
+
+    gmsh.model.occ.fillet([MoldLidTopDimTag[1]], BorderTagz, [0.7])
+    gmsh.model.occ.synchronize()
+    gmsh.fltk.run()
+
     MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2+Const.MoldWallThickness+Const.MoldCoverTolerance,
                                                      0,
                                                      Const.MoldCoverTolerance, 

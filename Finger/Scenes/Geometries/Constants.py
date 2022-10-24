@@ -8,6 +8,15 @@ Created on Mon Jan 17 11:30:30 2022
 
 import numpy as np
 
+def filterDimTagz(DimTagz, dimension=0):
+    FilteredTagz = []
+    for DimTag in DimTagz:
+        if DimTag[0] == dimension:
+            FilteredTagz.append(DimTag)
+def dimTagz2Tagz(DimTagz, dimension):
+    Tagz = [tag for (dim, tag) in DimTagz]
+    return Tagz
+        
 # Geometric parameters
 Length = 40
 Height = 20
@@ -46,5 +55,5 @@ HeightMold = Height + FixationWidth + MoldWallThickness
 MoldHoleLidBorderThickness = 2
 
 #Cable
-CableRadius = 0.75
+CableRadius = 0.8
 CableDistance = 10
