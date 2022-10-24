@@ -18,7 +18,7 @@ FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6
 NBellows = 1
-BellowHeight = 15
+BellowHeight = 8
 TeethRadius = Thickness/2   
 WallThickness = 3.5
 CenterThickness = 1.5
