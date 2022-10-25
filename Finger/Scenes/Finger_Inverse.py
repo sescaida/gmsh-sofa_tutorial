@@ -4,7 +4,7 @@ import SofaRuntime
 import os
 import sys
 import numpy as np
-
+from scipy.spatial.transform import Rotation as R
 
 import os
 
@@ -37,7 +37,7 @@ class Controller(Sofa.Core.Controller):
         self.begun = False
         
         self.ModelNode = self.RootNode.model        
-        self.CableActuator = self.ModelNode.CableNode.CableActuator
+        self.CableEquality = self.ModelNode.CableNode.CableEquality
         self.FPA1 = self.ModelNode.PushingActuationNode.FPA1
         self.FPA2 = self.ModelNode.PushingActuationNode.FPA2
         #self.ReferenceMO = self.RootNode.ReferenceMONode.ReferenceMO
@@ -58,12 +58,17 @@ class Controller(Sofa.Core.Controller):
         self.SideInflationSign = 1
         self.LivePressureDataPath = "PressureData.txt"
         self.LiveMuCaDataPath = "MuCaData.txt"
+        self.MotorPosition = 0 # in deg
         self.Data = np.array([])
         self.LastData = self.Data
         NSensors = 5
         self.Contacts = np.zeros(NSensors,int)
         self.ContactIdxs = np.array([0,1,2,3,4,5])
-        self.ContactDirections = np.array([[1,0,0],[0,-1,0], [-1,0,0],[1,0,0],[0,-1,0],[-1,0,0]])
+        self.ContactDirections = np.array([[-1,0,0],[0,-1,0], [1,0,0],[-1,0,0],[0,-1,0],[1,0,0]])
+        
+        
+        #---- eval stuff ---
+        self.PoseLog = np.empty((0,14))
         
         
         print('Finished Init')
@@ -80,7 +85,7 @@ class Controller(Sofa.Core.Controller):
             self.Data = np.loadtxt(self.LivePressureDataPath)
             self.RealPressures = self.Data[:4] # in kPa            
             self.MuCaData = np.loadtxt(self.LiveMuCaDataPath)
-            
+
         except Exception as e:
             print("Warning: couldn't read pressures or contact mask from file")
 #            self.Data = self.LastData
@@ -91,15 +96,14 @@ class Controller(Sofa.Core.Controller):
         print('Pressures: ' +  str(self.RealPressures))
         if self.Data.size == 0:
                 return
-               
-        
+                       
         self.InitialVolumeCavity1 = self.VolumeEffector1.initialCavityVolume.value
         self.InitialVolumeCavity2 = self.VolumeEffector2.initialCavityVolume.value
         self.InitialVolumeCavity3 = self.VolumeEffector3.initialCavityVolume.value
         self.InitialVolumeCavity4 = self.VolumeEffector4.initialCavityVolume.value
         
         FactorU = 10
-        Factor = 3
+        Factor = 2.5
         #Factor = 17
         AtmPressure = 101 #kPa
         # P*V is constant, Ci are theses constants as found by the initial volume. A factor is introduced to account for tubing and volume inside the pressure sensor        
@@ -128,31 +132,28 @@ class Controller(Sofa.Core.Controller):
         if len(self.MuCaData) == 0:
             print("empty!")
             return
+
+        Idxs = []        
         
-        Idxs = []
-        MeanSect1 = np.mean(self.MuCaData[0,1:])
-        print("Mean Sect1: {}".format(MeanSect1))
-        DetectionThreshold1 = 100
-        DetectionThreshold2 = 60
+        DetectionThreshold1 = 55
+        DetectionThreshold2 = 150
         DetectionThreshold3 = 100
-        if ((self.MuCaData[0,1]-MeanSect1)> DetectionThreshold1):
-            Idxs = Idxs +  [0]
-        elif ((self.MuCaData[0,2]-MeanSect1)> DetectionThreshold2):
-            Idxs = Idxs +  [1]
-        elif ((self.MuCaData[0,3]-MeanSect1)> DetectionThreshold3):
-            Idxs = Idxs +  [2]
-            
-        MeanSect2 = np.mean(self.MuCaData[1,1:])
-        print("Mean Sect2: {}".format(MeanSect2))
+        if self.MuCaData[0,1] > DetectionThreshold1:
+            Idxs = Idxs +  [0]        
+        elif self.MuCaData[0,3] > DetectionThreshold3:
+            Idxs = Idxs +  [2]            
+                
         DetectionThreshold3 = 100
-        DetectionThreshold4 = 70
-        DetectionThreshold5 = 100
-        if ((self.MuCaData[1,1]-MeanSect1)> DetectionThreshold3):
+        DetectionThreshold4 = 1000 # this will never activate it!
+        DetectionThreshold5 = 40
+        if self.MuCaData[1,1] > DetectionThreshold3:
             Idxs = Idxs +  [3]
-#        elif ((self.MuCaData[1,2]-MeanSect1)> DetectionThreshold4):
-#            Idxs = Idxs +  [4]
-#        elif ((self.MuCaData[1,3]-MeanSect1)> DetectionThreshold5):
-#            Idxs = Idxs +  [5]
+        elif self.MuCaData[1,2] > DetectionThreshold4:
+            Idxs = Idxs +  [4]
+        elif self.MuCaData[1,3] > DetectionThreshold5:
+            Idxs = Idxs +  [5]
+        elif self.MuCaData[0,2] > DetectionThreshold2:
+            Idxs = Idxs +  [1]
 #            
 #            
         
@@ -213,13 +214,21 @@ class Controller(Sofa.Core.Controller):
     def onKeypressedEvent(self, c):
         key = c['key']        
                         
+        if key=='l' or key=='L':
+            print("Logging pose!")
+            CurrentPoses = np.concatenate((self.TrackableFrameMO.position.value[0], self.TrackableRepresentationMO.position.value[0]))
+            print("CurrentPoses: {}".format(CurrentPoses))
+            self.PoseLog = np.concatenate((self.PoseLog,[CurrentPoses]),0)
+        if key=='f' or key=='F':
+            print("finishing log")
+            np.savetxt("OutputData/PoseLog.txt",self.PoseLog)
 
 def createScene(rootNode):
     
-                rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots SoftRobots.Inverse')# EigenLinearSolvers')
+                rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots SoftRobots.Inverse')
                 rootNode.addObject('VisualStyle', displayFlags='hideWireframe showBehaviorModels hideCollisionModels hideBoundingCollisionModels showForceFields showInteractionForceFields')
 
-                rootNode.findData('gravity').value = [0, 0, -9810] #
+                rootNode.findData('gravity').value = [0, 0, 0] #
                 rootNode.findData('dt').value = 0.02
 
                 rootNode.addObject('FreeMotionAnimationLoop')
@@ -237,8 +246,8 @@ def createScene(rootNode):
                    
                 
                 model = rootNode.addChild('model')
-#                model.addObject('EulerImplicit', name='odesolver',rayleighStiffness=0.1)
-                model.addObject('EulerImplicit', name='odesolver',rayleighStiffness=0.1)
+                model.addObject('EulerImplicit', name='odesolver')#,rayleighStiffness=0.01)
+                #model.addObject('EulerImplicit', name='odesolver',rayleighStiffness=0.1)
                 #model.addObject('PCGLinearSolver', name='linearSolver',iterations='25', tolerance='1.0e-9', preconditioners="precond")
                 model.addObject('SparseLDLSolver', name='precond')
                 #model.addObject('EigenSimplicialLDLT', name='precond', template="CompressedRowSparseMatrixMat3x3d")
@@ -246,7 +255,7 @@ def createScene(rootNode):
                 model.addObject('MeshVTKLoader', name='loader', filename=VolumetricMeshPath, scale3d=[1, 1, 1])
                 model.addObject('TetrahedronSetTopologyContainer', src='@loader', name='container')
                 model.addObject('TetrahedronSetGeometryAlgorithms')
-                model.addObject('MechanicalObject', name='tetras', template='Vec3d', showIndices='false', showIndicesScale='4e-5')
+                model.addObject('MechanicalObject', name='tetras', template='Vec3d', showIndices='false', showIndicesScale='10')
                 model.addObject('UniformMass', totalMass='0.1')
                 model.addObject('TetrahedronFEMForceField', template='Vec3d', name='FEM', method='large', poissonRatio=Const.PoissonRation,  youngModulus=Const.YoungsModulus)
 
@@ -293,7 +302,7 @@ def createScene(rootNode):
                 
                 
                 NSegments = 3
-                CableHeight = 2*(Const.Height-Const.JointHeight)/3
+                CableHeight = 8*(Const.Height-Const.JointHeight)/10
                 LengthDiagonal = CableHeight/np.cos(Const.JointSlopeAngle)
                 JointStandoff = LengthDiagonal*np.sin(Const.JointSlopeAngle)
                 JointStandoffExtra = 2
@@ -306,7 +315,8 @@ def createScene(rootNode):
                 
                 CableNode.addObject('MechanicalObject', position=CablePoints.tolist())
                 
-                CableNode.addObject('CableActuator', template='Vec3d', name='CableActuator', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True)                               
+                CableNode.addObject('CableActuator', template='Vec3d', name='CableEquality', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True)                               
+#                CableNode.addObject('CableEquality', template='Vec3d', name='CableEquality', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, eqDisp=0)                                               
                 CableNode.addObject('BarycentricMapping')             
                 
                 ##########################################
@@ -329,10 +339,17 @@ def createScene(rootNode):
                 FPA1 = PushingActuationNode.addObject('ForcePointActuator', name="FPA1", direction=[1,0,0], indices = [0], showForce=True,visuScale=0.2, template='Vec3d', printLog=True)                               
                 FPA2 = PushingActuationNode.addObject('ForcePointActuator', name="FPA2", direction=[1,0,0], indices = [], showForce=True,visuScale=0.2, template='Vec3d', printLog=True)                               
                 PushingActuationNode.addObject('BarycentricMapping')        
-                                                
-#                ##########################################
+                
+                      
+      
+
+            
+#                Awa = QuatOptiTrackFrame.inv().apply(MarkerBarycenter-Marker2Coords)
+                 ##########################################
 #                # Moving Point                           #
 #                ##########################################
+                
+                
 #                ReferenceMONode = rootNode.addChild('ReferenceMONode')
 #                
 #                ReferenceMONode.addObject("MechanicalObject", name="ReferenceMO", template="Vec3d", position=[-Const.Thickness/2, Const.Height/2, -2.5*Const.Length], showObject=True, showObjectScale=10) # orientation is 240 deg away from scene origin
