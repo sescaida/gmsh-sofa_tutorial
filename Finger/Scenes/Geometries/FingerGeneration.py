@@ -233,7 +233,8 @@ def createCavityVolume(OuterRadius, NBellows, BellowHeight, TeethRadius, WallThi
                                     2*OuterRadius, 
                                     CavityCorkThickness, 
                                     2*(TotalHeight+1)))    
-        
+    
+    gmsh.model.occ.synchronize()
     CutOut = gmsh.model.occ.cut(CavityBaseDimTag,[BoxDimTag])
     print("CutOut: ", CutOut)
     CavityDimTags = CutOut[0]

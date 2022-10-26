@@ -21,9 +21,6 @@ def createCableChannel(Length, Thickness):
     ChannelHeight = 1
     ChannelThickness = 2
     ChannelDepth = 3
-    
-    
-    
 
 def createCableChannelCork(Length, Thickness):
     pass
@@ -100,7 +97,6 @@ def createMoldLid(AllCavitiesDimTags):
 
     gmsh.model.occ.fillet([MoldLidTopDimTag[1]], BorderTagz, [0.7])
     gmsh.model.occ.synchronize()
-    gmsh.fltk.run()
 
     MoldLidInteriorDimTag = (3,gmsh.model.occ.addBox(-Const.ThicknessMold/2+Const.MoldWallThickness+Const.MoldCoverTolerance,
                                                      0,
@@ -108,15 +104,27 @@ def createMoldLid(AllCavitiesDimTags):
                                                      Const.ThicknessMold-2*Const.MoldWallThickness-2*Const.MoldCoverTolerance,
                                                      -Const.MoldWallThickness, 
                                                      -Const.LengthMold+2*Const.MoldWallThickness+2*Const.MoldCoverTolerance))
-    
     #-----------------
     # Create cavity cork
     #-----------------
     
-    CorkBellowHeight = Const.BellowHeight+2
-    CorkWallThickness = Const.WallThickness-1
-    CavityCorkSketchDimTag = (2, FingerGeneration.createCavitySketch(Const.OuterRadius, CorkBellowHeight, Const.TeethRadius, CorkWallThickness, Const.CenterThickness, Const.PlateauHeight))
+#    CorkBellowHeight = Const.BellowHeight+2
+#    CorkWallThickness = Const.WallThickness-1
+#      SurfaceTag =                               createCavitySketch(OuterRadius, BellowHeight, TeethRadius, WallThickness, CenterThickness, Constants.PlateauHeight)
 
+    CavityCorkSketchDimTag = (2, FingerGeneration.createCavitySketch(Const.OuterRadius, Const.BellowHeight, Const.TeethRadius, Const.WallThickness, Const.CenterThickness, Const.PlateauHeight))
+    
+    CorkBellowHeight = Const.BellowHeight + 1.2
+    CorkBellowThickness = 2*(Const.OuterRadius - Const.WallThickness) + 1
+    
+    FactorHeight = CorkBellowHeight/Const.BellowHeight
+    FactorWidth = CorkBellowThickness/(2*(Const.OuterRadius-Const.WallThickness))
+
+    gmsh.model.occ.dilate([CavityCorkSketchDimTag], 0, 0, 0, FactorWidth, 0, FactorHeight)
+    
+    print("FactorHeight: {}".format(FactorHeight))
+    print("FactorWidht: {}".format(FactorWidth))
+    
 #    
 #    CavityCorkSketchDimTag = (2,FingerGeneration.createCavitySketch(Const.OuterRadius, Const.NBellows, Const.BellowHeight, Const.TeethRadius, Const.WallThickness/2, Const.CenterThickness))
   

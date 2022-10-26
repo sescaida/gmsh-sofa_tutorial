@@ -90,18 +90,33 @@ def createHoleLidForMoldStage2():
 #LidPG = gmsh.model.addPhysicalGroup(3,[LidDimTag])
     
 def creakteMoldForCork():
+ 
     
+    CavityCorkSketchDimTag = (2, FingerGeneration.createCavitySketch(Const.OuterRadius, Const.BellowHeight, Const.TeethRadius, Const.WallThickness, Const.CenterThickness, Const.PlateauHeight))
     
-    CorkBellowHeight = Const.BellowHeight+2
-    CorkWallThickness = Const.WallThickness-1
-    CavityCorkSketchDimTag = (2, FingerGeneration.createCavitySketch(Const.OuterRadius, CorkBellowHeight, Const.TeethRadius, CorkWallThickness, Const.CenterThickness, Const.PlateauHeight))
+    CorkBellowHeight = Const.BellowHeight + 1.2
+    CorkBellowThickness = 2*(Const.OuterRadius - Const.WallThickness) + 1
+    
+    FactorHeight = CorkBellowHeight/Const.BellowHeight
+    FactorWidth = CorkBellowThickness/(2*(Const.OuterRadius-Const.WallThickness))
 
+    gmsh.model.occ.dilate([CavityCorkSketchDimTag], 0, 0, 0, FactorWidth, 0, FactorHeight)
+    
+    print("FactorHeight: {}".format(FactorHeight))
+    print("FactorWidht: {}".format(FactorWidth))
+    
+#    
+#    CavityCorkSketchDimTag = (2,FingerGeneration.createCavitySketch(Const.OuterRadius, Const.NBellows, Const.BellowHeight, Const.TeethRadius, Const.WallThickness/2, Const.CenterThickness))
+  
+    ExtrudeDimTags = gmsh.model.occ.extrude([CavityCorkSketchDimTag],0,Const.CavityCorkThickness,0)
+    
+    HalfDimTag = ExtrudeDimTags[1]
+    
     Tolerance = 2
     TotalBellowHeight = Const.NBellows * Const.BellowHeight
     CorkMoldHeight = TotalBellowHeight + 2 * Tolerance
     CorkMoldThickness = (Const.OuterRadius+Tolerance) * 2    
-    ExtrudeDimTags = gmsh.model.occ.extrude([CavityCorkSketchDimTag],0,Const.CavityCorkThickness,0)    
-    HalfDimTag = ExtrudeDimTags[1]
+ 
         
 #    HalfCopyDimTag = gmsh.model.occ.copy([HalfDimTag])
 #    print("HalfCopyDimTag: ", HalfCopyDimTag)
