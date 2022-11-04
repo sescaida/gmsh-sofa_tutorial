@@ -51,18 +51,6 @@ def createLines(PointTags):
     #print('LineTags: ' + str(LineTags))
     return LineTags 
 
-def makeSegmentTipMod(SegmentDimTag, Length, Height, JointHeight, Thickness, JointSlopeAngle, FixationWidth=3, lc=1):
-     
-    Point1Tag = gmsh.model.occ.addPoint(-Thickness/2,JointHeight,-Length)
-    
-    LengthDiagonal = (Height-JointHeight)/np.cos(JointSlopeAngle)
-    JointStandoff = LengthDiagonal*np.sin(JointSlopeAngle)
-    Point2Tag = gmsh.model.occ.addPoint(-Thickness/2,Height,JointStandoff-Length)
-    CenterPointTag = gmsh.model.occ.addPoint(-Thickness/2,0,-Length/2)
-    CircleArcTag = gmsh.model.occ.addCircleArc(Point1Tag, CenterPointTag, Point2Tag)
-    
-    pass  
-
 def makeSegmentStage1Mod(SegmentDimTag, Length, Height, JointHeight, Thickness, JointSlopeAngle, lc=1):
     
     LengthDiagonal = (Height-JointHeight)/np.cos(JointSlopeAngle)

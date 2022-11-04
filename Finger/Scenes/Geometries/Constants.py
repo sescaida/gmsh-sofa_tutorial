@@ -25,7 +25,7 @@ Thickness = 17.5
 JointSlopeAngle = np.deg2rad(30)
 FixationWidth = 3
 
-OuterRadius = Thickness/2 + 6
+OuterRadius = Thickness/2 + 6 #max value is Thickness/2 + 9! 
 NBellows = 1
 BellowHeight = 8
 TeethRadius = Thickness/2   
@@ -57,3 +57,4 @@ MoldHoleLidBorderThickness = 2
 #Cable
 CableRadius = 0.8
 CableDistance = 10
+CableHeight = 17.75

@@ -186,21 +186,24 @@ def createScene(rootNode):
                 cable1 = cables.addChild('cable1')
                 
                 NSegments = 3
-                CableHeight = 2*(Const.Height-Const.JointHeight)/3
-                LengthDiagonal = CableHeight/np.cos(Const.JointSlopeAngle)
+#                CableHeight = 2*(Const.Height-Const.JointHeight)/3
+                CableHeight = Const.CableHeight
+                CableHeightRelative = CableHeight-Const.JointHeight
+                LengthDiagonal = CableHeightRelative/np.cos(Const.JointSlopeAngle)
                 JointStandoff = LengthDiagonal*np.sin(Const.JointSlopeAngle)
+                
                 BellowGap = Const.BellowHeight * (Const.NBellows-1)
                 
                 CablePoints = np.array([])
                 for i in range(NSegments):
                     SegmentOffsetBase = (Const.Length+BellowGap)*i
                     SegmentOffsetTip  = Const.Length*(i+1)+BellowGap*i
-                    CablePoints = np.append(CablePoints, [[0,CableHeight+Const.JointHeight,-JointStandoff - SegmentOffsetBase]])
-                    CablePoints = np.append(CablePoints, [[0,CableHeight+Const.JointHeight, JointStandoff - SegmentOffsetTip]])
+                    CablePoints = np.append(CablePoints, [[0,CableHeight,-SegmentOffsetBase - JointStandoff]])
+                    CablePoints = np.append(CablePoints, [[0,CableHeight, -SegmentOffsetTip + JointStandoff]])
                 
                 cable1.addObject('MechanicalObject', position=CablePoints.tolist())
                 
-                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight+Const.JointHeight, 0], printLog=True, value=10)                               
+                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight, 0], printLog=True, value=10)                               
                 cable1.addObject('BarycentricMapping')                
                                                 
                 ##########################################
