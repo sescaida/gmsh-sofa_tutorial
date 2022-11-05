@@ -36,7 +36,7 @@ def createFingerMold(Stage1Mod=False):
                                              Const.ThicknessMold, 
                                              Const.HeightMold, 
                                              -Const.LengthMold))
-    CableHeight = 5*Const.Height/6
+    CableHeight = Const.CableHeight
     CableLength = Const.LengthMold+2*Const.MoldWallThickness
     CableDimTag = (3,gmsh.model.occ.addCylinder(0,CableHeight,2*Const.MoldWallThickness,0,0,-CableLength,Const.CableRadius))
     
