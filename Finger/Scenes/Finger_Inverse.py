@@ -216,7 +216,7 @@ class Controller(Sofa.Core.Controller):
 
 def createScene(rootNode):
     
-                rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots SoftRobots.Inverse EigenLinearSolvers')
+                rootNode.addObject('RequiredPlugin', pluginName='SofaPython3 SoftRobots SoftRobots.Inverse')
                 rootNode.addObject('VisualStyle', displayFlags='hideWireframe showBehaviorModels hideCollisionModels hideBoundingCollisionModels showForceFields showInteractionForceFields')
 
                 rootNode.findData('gravity').value = [0, 0, -9810] #
@@ -245,7 +245,6 @@ def createScene(rootNode):
 
                 model.addObject('MeshVTKLoader', name='loader', filename=VolumetricMeshPath, scale3d=[1, 1, 1])
                 model.addObject('TetrahedronSetTopologyContainer', src='@loader', name='container')
-                model.addObject('TetrahedronSetGeometryAlgorithms')
                 model.addObject('MechanicalObject', name='tetras', template='Vec3d', showIndices='false', showIndicesScale='4e-5')
                 model.addObject('UniformMass', totalMass='0.1')
                 model.addObject('TetrahedronFEMForceField', template='Vec3d', name='FEM', method='large', poissonRatio=Const.PoissonRation,  youngModulus=Const.YoungsModulus)

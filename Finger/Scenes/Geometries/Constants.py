@@ -18,20 +18,25 @@ def dimTagz2Tagz(DimTagz, dimension):
     return Tagz
         
 # Geometric parameters
-Length = 40
+Length = 60
 Height = 20
-JointHeight = 6
+#JointHeight = 6
+JointHeight = 6.26
 Thickness = 17.5
 JointSlopeAngle = np.deg2rad(30)
+#JointSlopeAngle = 0.3376
 FixationWidth = 3
 
 OuterRadius = Thickness/2 + 6 #max value is Thickness/2 + 9! 
+#OuterRadius = 9.09 
 NBellows = 1
-BellowHeight = 8
+BellowHeight = 12
 TeethRadius = Thickness/2   
 WallThickness = 3.5
-CenterThickness = 1.5
+#CenterThickness = 1.5
+CenterThickness = 2.737
 CavityCorkThickness = 3
+#CavityCorkThickness = 4.805
 PlateauHeight = 3
 
 # Elasticity parameters
@@ -57,4 +62,5 @@ MoldHoleLidBorderThickness = 2
 #Cable
 CableRadius = 0.8
 CableDistance = 10
-CableHeight = 17.75
+#CableHeight = 17.75
+CableHeight = 13
