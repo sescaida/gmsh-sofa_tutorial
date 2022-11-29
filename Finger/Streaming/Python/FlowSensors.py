@@ -45,8 +45,11 @@ class FlowSensorsApp():
         self.Buff4 = SignalBufferTimeFlow.SignalBufferTime(self, 'Signal 4')
         self.Buff4 = SignalBufferTimeFlow.SignalBufferTime(self, 'Signal 5')
         
-        self.Buff1LineName = "Flow"
-        self.VisdomWin = self.vis.line(Y=self.Buff1.Data, X=self.Buff1.TimeStamps, env="main", win="Flow", name=self.Buff1LineName)
+        self.Buff1LineName = "Volume"
+        self.VisdomWin = self.vis.line(Y=self.Buff1.PushedOutVol, X=self.Buff1.TimeStamps, env="main", win="Volume", name=self.Buff1LineName)
+        
+        self.Buff1LineNameFlow = "Flow"
+        self.VisdomWinFlow = self.vis.line(Y=self.Buff1.Data, X=self.Buff1.TimeStamps, env="main", win="Flow", name=self.Buff1LineNameFlow)
         
         
         self.ReleaseDetected = False  
@@ -109,6 +112,7 @@ class FlowSensorsApp():
                 self.detectRelease()                    
                     
                 self.vis.line(Y=self.Buff1.PushedOutVol[::PlotSkip], X=self.Buff1.TimeStamps[::PlotSkip], update='replace', env="main", win=self.VisdomWin, name=self.Buff1LineName)                
+                self.vis.line(Y=self.Buff1.Data, X=self.Buff1.TimeStamps, env="main", update='replace', win=self.VisdomWinFlow, name=self.Buff1LineNameFlow)
                 
                 self.endtime = time.time()
                 self.DeltaT = self.endtime - self.starttime
