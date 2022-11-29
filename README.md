@@ -1,7 +1,7 @@
 # gmsh-sofa_tutorial
 
 ## Requirements, Setting Up
-This tutorial/toolbox was tested with Gmsh 4.9.3 [1] and the SOFA v21.12 binaries including the SoftRobots-plugin (v21.12) for Linux and Windows. The binaries for SOFA and the SoftRobots-plugin can be found here [2]. Alternatively, you can use the more recent binaries [4]. Especially for Windows, don't forget to read the instructions [3]. In any case, be aware of the python version you need to have installed on your system.
+This tutorial/toolbox was tested with Gmsh 4.9.3 [1] and the SOFA v21.12 binaries including the SoftRobots-plugin (v21.12) for Linux and Windows. The binaries for SOFA and the SoftRobots-plugin can be found here [2]. Alternatively, you can use the more recent binaries v22.06, including the SoftRobots.Inverse plugin [4]. Especially for Windows, don't forget to read the instructions [3]. In any case, be aware of the python version you need to have installed on your system.
 
 [1] Install using pip ($pip install gmsh==4.9.3)
 
