@@ -46,6 +46,7 @@ void setup()
   pinMode(A1, INPUT);
   pinMode(A2, INPUT);
   pinMode(A3, INPUT);
+  //Serial.println("Flow, Volume");
   
   InitTimestamp = millis();
 }
@@ -113,13 +114,7 @@ void loop()
     Serial.print(F0,8);
     Serial.print(",");
     float EmpiricalCalibrationFactor = 1.15;
-    Serial.print(Volume*EmpiricalCalibrationFactor/1000,8); //output is in L!
-    Serial.print(",");
-    Serial.print(P2,4);
-    Serial.print(",");
-    Serial.print(P3);
-    Serial.print(",");
-    Serial.println(0); 
+    Serial.println(Volume*EmpiricalCalibrationFactor/1000,8); //output is in L!
     
     // Make sure integration and counters are set back to 0!
     Counter = 0;
