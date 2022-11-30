@@ -90,7 +90,7 @@ class FlowSensorsApp():
                     StringObj = self.CurrentValuesAsStr.decode()            
                     Val1,Val2,Val3,Val4,Val5 = StringObj.split(',')                        
                     self.CurrentValues = [float(Val1), float(Val2), float(Val3), float(Val4),float(Val5)] 
-                    print("CurrentValues: ", self.CurrentValues)                             
+                    # print("CurrentValues: ", self.CurrentValues)                             
                     self.OldValues = self.CurrentValues            
                 except Exception as woot:
                     print(woot.args)
@@ -114,6 +114,7 @@ class FlowSensorsApp():
                 self.vis.line(Y=self.Buff1.PushedOutVol[::PlotSkip], X=self.Buff1.TimeStamps[::PlotSkip], update='replace', env="main", win=self.VisdomWin, name=self.Buff1LineName)                
                 self.vis.line(Y=self.Buff1.Data, X=self.Buff1.TimeStamps, env="main", update='replace', win=self.VisdomWinFlow, name=self.Buff1LineNameFlow)
                 
+                print("CurrentVolume: {}".format(self.Buff1.PushedOutVol[-1]))
                 self.endtime = time.time()
                 self.DeltaT = self.endtime - self.starttime
                 self.starttime = time.time()
