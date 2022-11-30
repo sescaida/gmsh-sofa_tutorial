@@ -18,7 +18,7 @@ def dimTagz2Tagz(DimTagz, dimension):
     return Tagz
         
 # Geometric parameters
-Length = 60
+Length = 40
 Height = 20
 #JointHeight = 6
 JointHeight = 6.26
