@@ -63,4 +63,4 @@ MoldHoleLidBorderThickness = 2
 CableRadius = 0.8
 CableDistance = 10
 #CableHeight = 17.75
-CableHeight = 13
+CableHeight = OuterRadius + 1.2
