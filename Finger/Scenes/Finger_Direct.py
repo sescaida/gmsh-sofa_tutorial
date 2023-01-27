@@ -19,6 +19,7 @@ class Controller(Sofa.Core.Controller):
         print(" Python::__init__::" + str(self.name.value))
         
         self.RootNode = kwargs['RootNode']
+        self.VTKLoader = kwargs['VTKLoader']
         print(kwargs['RootNode'])
         
         self.Counter = 0
@@ -57,10 +58,14 @@ class Controller(Sofa.Core.Controller):
         if (key == "0"):
             InitialCavityVolume = self.ModelNode.Cavity01.SurfacePressureConstraint.initialCavityVolume.value
             Cavity01VolumeGrowth = self.SurfacePressureConstraint1.volumeGrowth.value
+            Cavity02VolumeGrowth = self.SurfacePressureConstraint2.volumeGrowth.value
             GrowthPercent = np.abs(Cavity01VolumeGrowth)/InitialCavityVolume * 100
             GrowthPerDisplacement = GrowthPercent/CurrentCableLength
-            print("GrowthPercent: ", GrowthPercent)
-            print("GrowthPerDisplacement: ", GrowthPerDisplacement)
+            # print("GrowthPercent: ", GrowthPercent)
+            # print("GrowthPerDisplacement: ", GrowthPerDisplacement)
+            print("NNodes: {}".format(len(self.VTKLoader.position)))
+            print("VolumeGrowth1: {}".format(Cavity01VolumeGrowth))
+            print("VolumeGrowth2: {}".format(Cavity02VolumeGrowth))
         
         if (key == "6"):
             pass
@@ -135,7 +140,7 @@ def createScene(rootNode):
                 model.addObject('SparseLDLSolver', name='precond')
                 #model.addObject('EigenSimplicialLDLT', name='precond', template="CompressedRowSparseMatrixMat3x3d")
 
-                model.addObject('MeshVTKLoader', name='loader', filename=VolumetricMeshPath, scale3d=[1, 1, 1])
+                VTKLoader = model.addObject('MeshVTKLoader', name='loader', filename=VolumetricMeshPath, scale3d=[1, 1, 1])
                 model.addObject('TetrahedronSetTopologyContainer', src='@loader', name='container')
                 #model.addObject('TetrahedronSetTopologyContainer', name='container', triangles='@loader.triangles', tetrahedra='@loader.tetrahedra')
                 model.addObject('TetrahedronSetGeometryAlgorithms')
@@ -216,6 +221,6 @@ def createScene(rootNode):
                 ##########################################
                 # Controller                             #
                 ##########################################
-                rootNode.addObject(Controller(name="ActuationController", RootNode=rootNode))
+                rootNode.addObject(Controller(name="ActuationController", RootNode=rootNode, VTKLoader=VTKLoader))
                 
                 return rootNode

@@ -40,8 +40,9 @@ CavityCorkThickness = 3
 PlateauHeight = 3
 
 # Elasticity parameters
-PoissonRation = 0.3
-YoungsModulus = 3000
+# PoissonRation = 0.495
+PoissonRation = 0.495
+YoungsModulus = 300000
 
 # Mold parameters
 MoldWallThickness = 3
@@ -63,4 +64,15 @@ MoldHoleLidBorderThickness = 2
 CableRadius = 0.8
 CableDistance = 10
 #CableHeight = 17.75
-CableHeight = OuterRadius + 1.2
+
+
+BellowHeight =  13
+OuterRadius = 17.522
+CavityCorkThickness = 2.048
+JointHeight = 6.450
+JointSlopeAngle = 0.592
+OuterRadius = 17.522
+PlateauHeight = 3.859
+WallThickness = 3
+
+CableHeight = OuterRadius + 1

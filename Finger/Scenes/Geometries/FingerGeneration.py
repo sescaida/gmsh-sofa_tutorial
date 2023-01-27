@@ -39,6 +39,29 @@ def defineMeshSizes(lc=0.5):
     gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
     
 
+def defineMeshSizesZones(Center, Height, lc=0.5, FieldId=0):   
+    #-------------------
+    # MeshSizes 
+    #-------------------
+
+
+    gmsh.model.mesh.field.add("Box", FieldId)
+    gmsh.model.mesh.field.setNumber(FieldId, "VIn", lc)
+    gmsh.model.mesh.field.setNumber(FieldId, "VOut", 10)
+    gmsh.model.mesh.field.setNumber(FieldId, "XMin", -Constants.Thickness)
+    gmsh.model.mesh.field.setNumber(FieldId, "XMax", Constants.Thickness)
+    gmsh.model.mesh.field.setNumber(FieldId, "YMin", -Constants.Height)
+    gmsh.model.mesh.field.setNumber(FieldId, "YMax", Constants.Height)
+    gmsh.model.mesh.field.setNumber(FieldId, "ZMin", -Center-Height)
+    gmsh.model.mesh.field.setNumber(FieldId, "ZMax", -Center+ Height)    
+    gmsh.model.mesh.field.setNumber(FieldId, "Thickness", 0.3)   
+    
+    
+    gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
+    
+
 def createLines(PointTags):
     
     LineTags = np.empty((0,1),dtype=int)
@@ -253,7 +276,8 @@ def exportCavities(lc=5):
     #-------------------
     # Cavities
     #-------------------   
-    lc = 0.5
+    lc = 0.11
+    # lc = 3
     
     BellowGap = (Constants.NBellows-1)*Constants.BellowHeight
     
@@ -328,7 +352,17 @@ def createFinger(Stage1Mod=False, lc = 7):
     # Export 
     #-------------------
     
-    defineMeshSizes(lc)
+    LcLocal = 2
+    # defineMeshSizesZones(Constants.Length, 100, lc=LcLocal, FieldId=1)
+    # gmsh.model.mesh.field.setAsBackgroundMesh(1)
+    defineMeshSizesZones(Constants.Length, Constants.BellowHeight/2, lc=LcLocal, FieldId=1)
+    defineMeshSizesZones(2*Constants.Length, Constants.BellowHeight/2, lc=LcLocal, FieldId=2)
+    
+    gmsh.model.mesh.field.add("Min", 3)
+    gmsh.model.mesh.field.setNumbers(3, "FieldsList", [1,2])
+    gmsh.model.mesh.field.setAsBackgroundMesh(3)
+    
+    # defineMeshSizesZones(2*Constants.Height, Constants.BellowHeight/2+2, lc=3, FieldId=1)
     
     gmsh.model.occ.synchronize()    
     gmsh.write("Finger_Parametric.step")
