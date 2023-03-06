@@ -276,7 +276,7 @@ def exportCavities(lc=5):
     #-------------------
     # Cavities
     #-------------------   
-    lc = 0.11
+    lc = 0.2
     # lc = 3
     
     BellowGap = (Constants.NBellows-1)*Constants.BellowHeight
@@ -352,7 +352,7 @@ def createFinger(Stage1Mod=False, lc = 7):
     # Export 
     #-------------------
     
-    LcLocal = 2
+    LcLocal = 7
     # defineMeshSizesZones(Constants.Length, 100, lc=LcLocal, FieldId=1)
     # gmsh.model.mesh.field.setAsBackgroundMesh(1)
     defineMeshSizesZones(Constants.Length, Constants.BellowHeight/2, lc=LcLocal, FieldId=1)

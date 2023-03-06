@@ -208,7 +208,7 @@ def createScene(rootNode):
                 
                 cable1.addObject('MechanicalObject', position=CablePoints.tolist())
                 
-                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight, 0], printLog=True, value=10)                               
+                cable1.addObject('CableConstraint', template='Vec3d', name='CableConstraint', indices=list(range(2*NSegments)), pullPoint=[0, CableHeight, 0], printLog=True, value=10.5)                               
                 cable1.addObject('BarycentricMapping')                
                                                 
                 ##########################################

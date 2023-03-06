@@ -5,13 +5,14 @@ path = os.path.dirname(os.path.abspath(__file__))+'/mesh/'
 
 def createScene(rootNode):
 
-                rootNode.addObject('RequiredPlugin', pluginName='SoftRobots SofaOpenglVisual SofaSparseSolver SofaPreconditioner')
+                rootNode.addObject('RequiredPlugin', pluginName='SoftRobots Sofa.GL.Component.Rendering3D Sofa.Component.LinearSolver.Direct Sofa.Component.LinearSolver.Preconditioner  Sofa.Component.LinearSolver.Iterative')
                 rootNode.addObject('VisualStyle', displayFlags='showVisualModels hideBehaviorModels showCollisionModels hideBoundingCollisionModels showForceFields showInteractionForceFields hideWireframe')
 
                 rootNode.addObject('FreeMotionAnimationLoop')
                 rootNode.addObject('GenericConstraintSolver', maxIterations=100, tolerance = 0.0000001)
 
-		#bunny
+                		
+
                 bunny = rootNode.addChild('bunny')
                 bunny.addObject('EulerImplicitSolver', name='odesolver')
                 bunny.addObject('ShewchukPCGLinearSolver', iterations=15, name='linearsolver', tolerance=1e-5, preconditioners='preconditioner', use_precond=True, update_step=1)
@@ -32,23 +33,28 @@ def createScene(rootNode):
                 #bunny.addObject('UncoupledConstraintCorrection')
 
 
-		#bunny/cavity
+		
                 cavity = bunny.addChild('cavity')
                 cavity.addObject('MeshSTLLoader', name='loader', filename='Accordion_Cavity.stl')
                 cavity.addObject('MeshTopology', src='@loader', name='topo')
                 cavity.addObject('MechanicalObject', name='cavity')
-                cavity.addObject('SurfacePressureConstraint', triangles='@topo.triangles', value=16, valueType=0)
-                cavity.addObject('BarycentricMapping', name='mapping',  mapForces=False, mapMasses=False)
+                cavity.addObject('SurfacePressureConstraint', triangles='@topo.triangles', value=32, valueType=0)
+                cavity.addObject('BarycentricMapping', name='mapping',  mapForces=False, mapMasses=False)                
+                
+		        ##########################################
+                # Visualization                          #
+                ##########################################
+                
+                # Visualization                          
+                modelVisu = bunny.addChild('visu')
+                modelVisu.addObject('MeshSTLLoader', filename="Accordion_Surface.stl", name="loader")
+                modelVisu.addObject('OglModel', src="@loader", scale3d=[1, 1, 1])
+                modelVisu.addObject('BarycentricMapping')
 
+                
 
-		#bunny/bunnyVisu
-                bunnyVisu = bunny.addChild('visu')
-                bunnyVisu.addObject('TriangleSetTopologyContainer', name='container')
-                bunnyVisu.addObject('TriangleSetTopologyModifier')
-                bunnyVisu.addObject('Tetra2TriangleTopologicalMapping', name='Mapping', input="@../container", output="@container")
-
-                bunnyVisu.addObject('OglModel', color=[0.3, 0.2, 0.2, 0.6])
-                bunnyVisu.addObject('IdentityMapping')
 
 
                 return rootNode
+
+
