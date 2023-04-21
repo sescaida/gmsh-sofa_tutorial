@@ -54,7 +54,7 @@ def updatefig(*args):
             
             
             # remapping to account for                     
-            Matrix = -np.array([[Matrix[0,0], Matrix[0,2],Matrix[0,1],Matrix[0,3]],[Matrix[1,0], Matrix[1,3],Matrix[1,2],Matrix[1,1]]])
+            Matrix = np.array([[Matrix[0,0], Matrix[0,2],Matrix[0,1],Matrix[0,3]],[Matrix[1,0], Matrix[1,3],Matrix[1,2],Matrix[1,1]]])
             print("Raw Matrix")
             print(Matrix)        
             MeanSect1 = np.mean(Matrix[0,1:])
