@@ -4,9 +4,12 @@ import SofaRuntime
 import os
 import sys
 import numpy as np
+
 from scipy.spatial.transform import Rotation as R
 
 import os
+
+print("Test")
 
 GeneratedMeshesPath = os.path.dirname(os.path.abspath(__file__))+'/Geometries/'
 
