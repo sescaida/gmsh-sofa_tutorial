@@ -12,7 +12,7 @@ GeneratedMeshesPath = os.path.dirname(os.path.abspath(__file__))+'/Geometries/'
 
 import Geometries.Constants as Const
 
-print("Test 2")
+print("hola mundo")
 
 class Controller(Sofa.Core.Controller):   
     
